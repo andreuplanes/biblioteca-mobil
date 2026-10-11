@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v0.9c (12/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v0.9d (12/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
-     v0.9c: USUARIS_PERMESOS = ['andreuplanes@gmail.com'] (el compte de Dropbox dels dos mòbils): qualsevol altre compte en surt,
+     v0.9d: el catàleg de la Biblioteca es llegeix del fitxer MÉS RECENT (biblioteca_projectes_rev.json de la cuina o
+      biblioteca_projectes.json de patrimoni), per data de Dropbox / del servidor. Preparat per al pas a patrimoni.
+    v0.9c: USUARIS_PERMESOS = ['andreuplanes@gmail.com'] (el compte de Dropbox dels dos mòbils): qualsevol altre compte en surt,
       ara també en OBRIR l'app (abans només en entrar a Dropbox).
     v0.9b: ZOOM CAP AL PUNT (Andreu: «el zoom és una passada, però si vull centrar-me en una zona és molt difícil»): el
       pessic i la roda s'apropen al punt del model que tens entre els dits / sota el ratolí (com un mapa); doble toc en un
@@ -441,7 +443,16 @@ async function reconstrueix(){
 }
 function desaCau(){ try{ localStorage.setItem(LOCAL?'bm.cau.panell':'bm.cau', JSON.stringify({ quan:Date.now(), cursor:CURSOR, entrades:ENTRADES, inv:INV })); }catch(e){ toast('⚠ no cap tot a la memòria del mòbil; es tornarà a llegir cada cop'); } }
 function llegeixCau(){ try{ const c=JSON.parse(localStorage.getItem(LOCAL?'bm.cau.panell':'bm.cau')||'null'); if(c && Array.isArray(c.inv)){ INV=c.inv; CURSOR=c.cursor||null; ENTRADES=c.entrades||{}; return true; } }catch(e){} return false; }
-async function llegeixDB(){ const b=CFG.arrel.replace(/\/+$/,'')+'/'+DB_CAMI; const d=(await baixaJSON(b+'_rev.json'))||(await baixaJSON(b+'.json')); DB={ projectes:(d&&d.projectes)||{}, fitxers:(d&&d.fitxers)||{} }; }
+/* v0.9d · catàleg: el MÉS RECENT entre el de la cuina (_rev) i el de patrimoni. Abans sempre el _rev primer: quan la Biblioteca
+   de Projectes passa a patrimoni, les anotacions noves van a biblioteca_projectes.json i el _rev vell hauria tapat-les. */
+async function dataFitxer(cami){
+  try{ if(LOCAL){ const r=await fetch(urlLocal(cami),{ method:'HEAD', cache:'no-store' }); if(!r.ok) return null; const lm=r.headers.get('Last-Modified'); return lm ? (Date.parse(lm)||0) : 0; }
+    const m=await rpc('files/get_metadata',{ path:cami }); return Date.parse(m.server_modified)||0; }catch(e){ return null; } }
+async function llegeixDB(){ const b=CFG.arrel.replace(/\/+$/,'')+'/'+DB_CAMI;
+  const [tr,tp]=await Promise.all([dataFitxer(b+'_rev.json'), dataFitxer(b+'.json')]);
+  const ordre=(tp!=null && (tr==null || tp>tr)) ? ['.json','_rev.json'] : ['_rev.json','.json'];
+  let d=null; for(const x of ordre){ d=await baixaJSON(b+x); if(d) break; }
+  DB={ projectes:(d&&d.projectes)||{}, fitxers:(d&&d.fitxers)||{} }; }
 
 /* ═════════════ Catàleg → el que es mostra ═════════════ */
 function rutaRel(p){ const a=CFG.arrel.replace(/\/+$/,''); return p.ruta.startsWith(a+'/') ? p.ruta.slice(a.length+1) : p.ruta; }
