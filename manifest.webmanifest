@@ -1,0 +1,2 @@
+{ "name": "Biblioteca de Projectes", "short_name": "Biblioteca", "start_url": "./", "display": "standalone", "background_color": "#f4f3ee", "theme_color": "#1f3a5f", "lang": "ca",
+  "icons": [ { "src": "icon.png", "sizes": "180x180", "type": "image/png" }, { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" } ] }

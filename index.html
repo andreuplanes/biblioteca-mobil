@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
+     PANELL · BIBLIOTECA MÒBIL · v0.9c (12/10/2026)
+     IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
+       sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
+       visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
+       manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v0.9c: USUARIS_PERMESOS = ['andreuplanes@gmail.com'] (el compte de Dropbox dels dos mòbils): qualsevol altre compte en surt,
+      ara també en OBRIR l'app (abans només en entrar a Dropbox).
+    v0.9b: ZOOM CAP AL PUNT (Andreu: «el zoom és una passada, però si vull centrar-me en una zona és molt difícil»): el
+      pessic i la roda s'apropen al punt del model que tens entre els dits / sota el ratolí (com un mapa); doble toc en un
+      punt: hi centra la càmera i s'hi apropa. ＋ / − al centre, ⤢ vista inicial.
+    v0.9a: els dos mòbils entren amb el MATEIX compte de Dropbox (Andreu, 11/10): no cal compartir carpetes; USUARIS_PERMESOS =
+      el correu d'aquest compte. Apps connectades de Dropbox talla l'accés als dos alhora (guia actualitzada).
+    v0.9a: ZOOM 3D MÉS POTENT (Andreu: «el glb, podríem tenir un zoom més potent?»). Abans el visor no deixava apropar-se més
+      enllà de la mida del model; ara fins a 3 cm de la peça (min-camera-orbit 0,03 m) i, a més, tancant l'objectiu fins a 4°
+      (min-field-of-view): es veu una fixació o un cargol de prop. Zoom més sensible (×1,6). Botons ＋ / − / ⤢ (tornar a la
+      vista inicial). Toc sobre un punt del model: hi centra la càmera (tot el que es fa després gira i s'apropa al voltant
+      d'aquell punt) → toc + ＋ per anar als detalls.
+    v0.9: DXF i DWG. Visor de DXF propi del PANELL (apps/comu/visordxf/visordxf.js, sense dependències): miniatura i visor
+      amb capes, zoom amb dos dits, fons clar/fosc. El DWG (format tancat d'Autodesk) es veu a través del seu DXF germà (mateix nom,
+      mateixa carpeta: el PANELL sempre fa el DXF i en treu el DWG); «📐 Obrir amb…» el porta a una app de l'iPhone (AutoCAD…).
+    v0.8a: «✕ Tancar · tornar al PANELL» tanca la pestanya i torna a la del PANELL (abans en carregava un altre i sortia l'avís de dues pestanyes).
+    v0.8: PDF. Miniatura amb la primera pàgina (llista, fitxa i lliurables) i visor propi (pdf.js 3.11, Mozilla, Apache 2.0,
+      desat al costat com el visor 3D: pdf.min.js + pdf.worker.min.js): totes les pàgines, − / + per ampliar. «📄 Obrir amb…» obre el
+      menú de l'iPhone per triar l'app (PDFelement, Llibres, Fitxers…): el PDF ja és baixat, així que s'obre amb un sol toc.
+    v0.7: al PANELL, «✕ Tancar · tornar al PANELL» (barra del marc d'iPhone; ✕ a la capçalera en «Sense marc»).
+    v0.7: PREVISUALITZACIONS a la llista i a la fitxa: vídeo (el primer fotograma, del mateix fitxer), model 3D (una foto feta
+      pel visor, quiet i tancat), imatge (miniatura de Dropbox). Es fan quan surten a la pantalla (no abans) i un toc a la miniatura
+      obre el visor. ⚙ «Previsualitzar vídeos i 3D» (gasta dades: amb poca cobertura es pot treure). Visor 3D: «⏸ Quiet / ▶ Moviment»
+      i, quiet, una barra per deixar-lo obert, tancat o a mig obrir (si el model té obertura).
+    v0.6: MODELS 3D (.glb, «🧊»): l'isomètric de Mampares desat com a model 3D es gira amb el dit (1 dit gira, 2 dits zoom),
+       amb l'animació si en porta, i a l'iPhone «📱 Veure-ho a l'espai» (Quick Look, realitat augmentada a mida real). Visor:
+       model-viewer 3.5.0 (Google, llicència BSD) desat al costat de la pàgina (model-viewer.min.js), sense internet.
+     v0.5: al PANELL es veu DINS D'UN iPHONE a mida real (16 · 16 Pro Max · SE), com una app de la pantalla d'inici: illa
+       dinàmica, barra d'estat, indicador d'inici i zones segures de cada model (--sat / --sab). «Sense marc» per veure-la nua.
+     v0.4: MODE PANELL per provar-la a l'ordinador (…/apps/oficina_tecnica/_mobil/index.html amb el PANELL engegat: llegeix el
+       disc pel servidor, sense Dropbox; es veu com un mòbil al centre de la pantalla) · ACCÉS per a dues persones: cadascú entra
+       amb el seu compte de Dropbox (la carpeta del PANELL compartida), USUARIS_PERMESOS (correus) com a segona porta, i a ⚙
+       surt amb quin compte s'ha entrat.
+     v0.3: a cada tria, els altres desplegables només ensenyen el que queda, amb el compte de fitxers («Vídeos (23)», «Mampares (8)»);
+       resum de la tria en una línia; amb molts resultats, els projectes surten plegats (un toc els desplega), amb pocs, tot obert.
+     v0.2: pantalla d'entrada = CERCA GUIADA (Andreu: «selectors desplegables: què busquem? de quin tipus d'app?»): Què busques
+       (tot / vídeos / imatges / PDF / DWG-DXF) · De quin tipus d'aplicació (sistemes) · Tipologia · Any · paraula · destacats ·
+       ordre, amb lletra gran; els resultats són els FITXERS agrupats per projecte, cadascun amb ▶ Veure i 📤 Enviar directes
+       («Fitxa ›» obre el projecte sencer).
+     Consulta des de l'iPhone (o qualsevol mòbil) de la Biblioteca de Projectes del PANELL, llegint
+     DIRECTAMENT el Dropbox de l'Andreu (API de Dropbox, entrada amb el seu usuari, PKCE: la pàgina no
+     veu mai la contrasenya). Sense servidor del PANELL, sense PC engegat, sense VPN.
+       · Llegeix projectes/_<grup>/<PROJECTE>/ (MEDIA/ i lliurables de les apps, fins a 2 nivells) amb
+         les mateixes regles que la Biblioteca del PANELL (oficina_biblioteca_projectes), i el catàleg
+         dades/oficina_tecnica/biblioteca_projectes/biblioteca_projectes[_rev].json (sistemes editats,
+         nom genèric, portada, destacats, publicables, títols, enllaços). NOMÉS LECTURA.
+       · Fitxa del projecte, visor (vídeo, imatge, PDF), 📤 Enviar (menú de compartir del mòbil, el
+         fitxer de debò), ⬇ Baixar, 🔗 Dropbox.
+       · L'inventari es desa al mòbil (localStorage) amb el cursor de Dropbox: en tornar a obrir, només
+         es demanen els canvis.
+     Configuració: APP_KEY (clau de l'app de Dropbox) i ARREL (carpeta del PANELL a Dropbox). Es poden
+     canviar a ⚙ (es desen al mòbil). La URL d'aquesta pàgina ha de ser la «Redirect URI» de l'app.
+     ═══════════════════════════════════════════════════════════════════════════════════════════════ -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Biblioteca">
+<meta name="theme-color" content="#1f3a5f">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Biblioteca de Projectes · mòbil</title>
+<style>
+:root{ --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --blau:#1f3a5f; --blau2:#2d5fa6; --fons:#f4f3ee; --carta:#fff; --text:#1c1c1c; --gris:#6b6a62; --linia:#dcdad2; --verd:#2e7d32; --taronja:#b87000; --verm:#c62828; }
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; background:var(--fons); color:var(--text); font:16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
+body{ padding-bottom:var(--sab); }
+header{ position:sticky; top:0; z-index:5; background:var(--blau); color:#fff; padding:calc(10px + var(--sat)) 12px 10px; display:flex; align-items:center; gap:10px; }
+header h1{ font-size:17px; margin:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+header button, header a#bTancaPanell{ text-decoration:none; }
+header button, header a#bTancaPanell{ background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:8px; padding:8px 10px; font-size:15px; }
+.pantalla{ display:none; }
+@media(min-width:700px){ html{ background:#d9d7cf; } body{ max-width:480px; margin:0 auto; min-height:100vh; box-shadow:0 0 0 1px #c9c7bf,0 10px 40px rgba(0,0,0,.18); }
+  body .visor{ left:50%; right:auto; width:480px; transform:translateX(-50%); } body .toast{ left:50%; right:auto; width:456px; transform:translateX(-50%); } }
+body.local .nomesDropbox{ display:none !important; }
+html.dins{ background:var(--fons); } html.dins body{ max-width:none; box-shadow:none; }
+html.dins body .visor{ left:0; right:0; width:auto; transform:none; } html.dins body .toast{ left:12px; right:12px; width:auto; transform:none; }
+html.dins ::-webkit-scrollbar{ display:none; } html.dins{ scrollbar-width:none; } .pantalla.activa{ display:block; }
+.cerca{ padding:10px 12px; display:flex; gap:8px; background:var(--fons); position:sticky; top:52px; z-index:4; }
+.cerca input{ flex:1; font-size:16px; padding:10px 12px; border:1px solid var(--linia); border-radius:10px; background:#fff; }
+.filtres{ display:flex; gap:8px; padding:0 12px 10px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.filtres select, .filtres label{ font-size:14px; padding:7px 10px; border:1px solid var(--linia); border-radius:999px; background:#fff; white-space:nowrap; }
+.filtres label input{ vertical-align:-2px; }
+.targetes{ padding:0 12px 20px; display:grid; grid-template-columns:1fr; gap:12px; }
+@media(min-width:560px){ .targetes{ grid-template-columns:1fr 1fr; } }
+.targeta{ background:var(--carta); border-radius:14px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.08); display:flex; }
+.targeta .port{ width:120px; min-height:96px; background:#e9e7df; display:flex; align-items:center; justify-content:center; font-size:34px; color:#9b998f; flex:none; }
+.targeta .port img{ width:100%; height:100%; object-fit:cover; }
+.targeta .cos{ padding:10px 12px; flex:1; min-width:0; }
+.targeta .nom{ font-weight:600; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.targeta .sis{ color:var(--blau2); font-size:13px; margin-top:2px; }
+.targeta .dades{ color:var(--gris); font-size:13px; margin-top:4px; }
+.estrella{ color:var(--taronja); }
+.estat{ padding:6px 12px 10px; color:var(--gris); font-size:13px; }
+/* cerca guiada */
+.guia{ padding:12px 12px 4px; display:flex; flex-direction:column; gap:10px; }
+.camp{ display:block; } .camp>span{ display:block; font-size:14px; font-weight:600; color:var(--gris); margin:0 0 4px 2px; }
+.gran{ width:100%; font-size:18px; padding:13px 12px; border:1px solid var(--linia); border-radius:12px; background:#fff; color:var(--text); -webkit-appearance:none; appearance:none; }
+select.gran{ background-image:linear-gradient(45deg,transparent 50%,var(--blau2) 50%),linear-gradient(135deg,var(--blau2) 50%,transparent 50%); background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%; background-size:6px 6px,6px 6px; background-repeat:no-repeat; padding-right:38px; }
+.dos{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.xec{ display:flex; align-items:center; gap:8px; font-size:15px; padding:8px 4px; } .xec input[type=checkbox]{ width:22px; height:22px; } .xec select{ font-size:15px; padding:6px 8px; border:1px solid var(--linia); border-radius:8px; background:#fff; }
+.resultats{ padding:0 12px 24px; }
+.grup-proj{ margin:14px 0 6px; padding:8px 10px; background:#e9edf4; border-radius:12px; display:grid; grid-template-columns:1fr auto; grid-template-areas:'n b' 's b'; align-items:center; column-gap:8px; }
+.grup-proj .n{ grid-area:n; font-weight:700; font-size:17px; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.grup-proj .s{ grid-area:s; color:var(--blau2); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.grup-proj button{ grid-area:b; }
+.grup-proj button{ background:#fff; border:1px solid var(--blau2); color:var(--blau2); border-radius:999px; padding:6px 12px; font-size:14px; }
+.fitxer{ background:var(--carta); border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); margin-bottom:8px; display:flex; align-items:stretch; overflow:hidden; }
+.fitxer .mini2{ width:88px; flex:none; background:#e9e7df; display:flex; align-items:center; justify-content:center; font-size:30px; color:#9b998f; }
+.fitxer .mini2 img{ width:100%; height:100%; object-fit:cover; }
+.mini2, .mini{ position:relative; cursor:pointer; }
+.mini2 > img.pv, .mini2 > video.pv, .mini > img.pv, .mini > video.pv{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#e9e7df; }
+.mini2.m3d > img.pv, .mini.m3d > img.pv{ object-fit:contain; background:linear-gradient(#dfe9f2,#f4f6f8 60%,#fbfaf7); }
+.pv-marca{ position:absolute; left:5px; bottom:5px; background:rgba(0,0,0,.55); color:#fff; font-size:11px; line-height:1; padding:4px 6px; border-radius:999px; pointer-events:none; }
+.mini .pv-marca{ bottom:auto; top:5px; }
+.fitxer .cos{ flex:1; min-width:0; padding:10px 10px 8px; display:flex; flex-direction:column; gap:6px; }
+.fitxer .t{ font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .fitxer .d{ color:var(--gris); font-size:13px; }
+.fitxer .acc{ display:flex; gap:8px; } .fitxer .acc button{ flex:1; border:0; border-radius:10px; padding:11px 6px; font-size:15px; background:var(--blau2); color:#fff; } .fitxer .acc button.sec{ background:#eceae2; color:var(--text); }
+/* fitxa */
+.fitxa h2{ font-size:18px; margin:12px 12px 2px; }
+.fitxa .sub{ color:var(--blau2); margin:0 12px 10px; font-size:14px; }
+.seccio{ margin:14px 12px 0; font-weight:600; color:var(--gris); font-size:13px; text-transform:uppercase; letter-spacing:.04em; }
+.graella{ padding:8px 12px; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+@media(min-width:560px){ .graella{ grid-template-columns:repeat(5,1fr); } }
+.mini{ background:var(--carta); border-radius:10px; overflow:hidden; aspect-ratio:1; position:relative; display:flex; align-items:center; justify-content:center; font-size:30px; color:#9b998f; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+.mini img{ width:100%; height:100%; object-fit:cover; }
+.mini .peu{ position:absolute; left:0; right:0; bottom:0; background:rgba(0,0,0,.55); color:#fff; font-size:11px; padding:3px 5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mini .estrella{ position:absolute; top:4px; right:6px; font-size:14px; }
+.llista{ margin:8px 12px; background:var(--carta); border-radius:12px; overflow:hidden; }
+.fila{ display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:1px solid var(--linia); }
+.fila:last-child{ border-bottom:0; }
+.fila .ic{ font-size:22px; width:28px; text-align:center; }
+.fila .t{ flex:1; min-width:0; } .fila .t .n{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .fila .t .on{ color:var(--gris); font-size:12px; }
+.fila .d{ color:var(--gris); font-size:12px; white-space:nowrap; }
+/* visor */
+.visor{ position:fixed; inset:0; background:#000; z-index:20; display:none; flex-direction:column; }
+.visor.obert{ display:flex; }
+.visor .cap{ color:#fff; padding:calc(10px + var(--sat)) 12px 8px; display:flex; align-items:center; gap:10px; background:rgba(0,0,0,.6); }
+.visor .cap .titol{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:15px; }
+.visor .cap button{ background:rgba(255,255,255,.18); color:#fff; border:0; border-radius:8px; padding:8px 12px; font-size:15px; }
+.visor .cos{ flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; }
+.visor .cos video, .visor .cos img{ max-width:100%; max-height:100%; }
+.visor .cos iframe{ width:100%; height:100%; border:0; background:#fff; }
+.visor .cos{ position:relative; } .visor .cos model-viewer{ display:block; }
+#mv3dZoom{ position:absolute; right:12px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:8px; z-index:2; }
+#mv3dZoom button{ width:46px; height:46px; border-radius:50%; border:0; background:#fff; color:#1f3a5f; font-size:24px; line-height:1; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+#mv3dCtl{ position:absolute; left:10px; right:10px; bottom:30px; display:flex; gap:8px; align-items:center; z-index:2; }
+#mv3dCtl button{ background:#fff; color:#1f3a5f; border:0; border-radius:999px; padding:9px 14px; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,.2); flex:none; }
+#mv3dCtl input[type=range]{ flex:1; min-width:0; accent-color:#1f3a5f; }
+#mv3dCtl .et{ font-size:11px; color:#5b6470; flex:none; }
+.visor .cos .pdfv{ position:absolute; inset:0; overflow:auto; -webkit-overflow-scrolling:touch; background:#525659; padding:8px 8px 70px; }
+.visor .cos .pdfv canvas{ display:block; margin:0 auto 8px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.4); }
+.pdfctl{ position:absolute; right:12px; bottom:12px; display:flex; gap:6px; align-items:center; z-index:2; }
+.pdfctl button{ background:#fff; color:#1f3a5f; border:0; border-radius:999px; width:42px; height:42px; font-size:22px; box-shadow:0 2px 8px rgba(0,0,0,.3); }
+.pdfctl span{ background:rgba(0,0,0,.6); color:#fff; font-size:12px; padding:5px 9px; border-radius:999px; }
+.mini2.pdf > img.pv, .mini.pdf > img.pv, .fila .ic.pdf > img.pv{ object-fit:contain; background:#d9d7cf; }
+.mini2.pla > img.pv, .mini.pla > img.pv, .fila .ic.pla > img.pv{ object-fit:contain; background:#fff; }
+.fila .ic.pla{ position:relative; width:54px; height:42px; border-radius:4px; overflow:hidden; flex:none; border:1px solid var(--linia); }
+.fila .ic.pdf{ position:relative; width:42px; height:54px; border-radius:4px; overflow:hidden; flex:none; }
+.fila .ic > img.pv{ position:absolute; inset:0; width:100%; height:100%; }
+.ajuda3d{ position:absolute; left:0; right:0; bottom:8px; text-align:center; color:#5b6470; font-size:12px; pointer-events:none; }
+model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; color:#1f3a5f; border:0; border-radius:999px; padding:9px 14px; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,.2); }
+.visor .cos .cad{ color:#ddd; text-align:center; padding:30px; font-size:17px; }
+.visor .cos .cad .gran{ font-size:64px; }
+.visor .peu{ background:rgba(0,0,0,.75); color:#fff; padding:10px 12px calc(12px + var(--sab)); display:flex; gap:8px; flex-wrap:wrap; }
+.visor .peu button, .visor .peu a{ flex:1; min-width:110px; background:var(--blau2); color:#fff; border:0; border-radius:10px; padding:12px 8px; font-size:15px; text-align:center; text-decoration:none; }
+.visor .peu button.sec, .visor .peu a.sec{ background:rgba(255,255,255,.18); }
+.visor .peu button:disabled{ opacity:.5; }
+.visor .nota{ color:#ccc; font-size:13px; padding:0 12px 6px; background:rgba(0,0,0,.75); }
+/* entrada / config */
+.centre{ padding:30px 20px; max-width:480px; margin:0 auto; }
+.centre h2{ margin:0 0 6px; } .centre p{ color:var(--gris); }
+.centre input{ width:100%; font-size:16px; padding:11px 12px; border:1px solid var(--linia); border-radius:10px; margin:6px 0 12px; background:#fff; }
+.centre button{ width:100%; background:var(--blau2); color:#fff; border:0; border-radius:12px; padding:14px; font-size:17px; margin-top:6px; }
+.centre button.sec{ background:#fff; color:var(--blau2); border:1px solid var(--blau2); }
+.centre .avis{ background:#fff4e0; border:1px solid #f0c070; border-radius:10px; padding:10px 12px; font-size:14px; margin:10px 0; }
+.buit{ padding:40px 20px; text-align:center; color:var(--gris); }
+.toast{ position:fixed; left:12px; right:12px; bottom:calc(16px + var(--sab)); background:#222; color:#fff; padding:12px 14px; border-radius:12px; z-index:30; font-size:14px; display:none; }
+.progres{ height:4px; background:var(--linia); border-radius:2px; overflow:hidden; margin:0 12px 8px; display:none; } .progres i{ display:block; height:100%; width:0; background:var(--blau2); transition:width .2s; }
+</style>
+</head>
+<body>
+
+<header>
+  <button id="bEnrere" style="display:none">‹</button>
+  <h1 id="titol">Biblioteca de Projectes</h1>
+  <button id="bActualitza" title="Actualitzar des de Dropbox">↻</button>
+  <a id="bTancaPanell" href="/sistema/coordinador.html" onclick="return tancaApp(event)" title="Tancar i tornar al menú principal del PANELL" style="display:none">✕</a>
+  <button id="bConfig" title="Configuració">⚙</button>
+</header>
+
+<!-- ENTRADA -->
+<section id="pEntrada" class="pantalla">
+  <div class="centre">
+    <h2>Biblioteca de Projectes</h2>
+    <p>Consulta dels projectes del PANELL (vídeos, imatges, PDF, DWG, DXF) des del mòbil, llegint el teu Dropbox. Només consulta i enviar; res no s'esborra ni es modifica.</p>
+    <div id="avisClau" class="avis" style="display:none">Falta la <b>clau de l'app de Dropbox</b>. Posa-la a ⚙ Configuració (la trobaràs a la consola d'apps de Dropbox, «App key»).</div>
+    <button id="bEntra">Entrar amb Dropbox</button>
+    <p style="font-size:13px;margin-top:14px">La contrasenya es posa a la pàgina de Dropbox, mai aquí. L'accés es pot revocar des de Dropbox → Configuració → Apps connectades.</p>
+  </div>
+</section>
+
+<!-- CONFIG -->
+<section id="pConfig" class="pantalla">
+  <div class="centre">
+    <h2>Configuració</h2>
+    <div class="nomesDropbox"><label>Clau de l'app de Dropbox (App key)</label>
+    <input id="cClau" placeholder="p. ex. a1b2c3d4e5f6g7h" autocapitalize="off" autocorrect="off">
+    <label>Carpeta del PANELL a Dropbox</label>
+    <input id="cArrel" placeholder="/PANELL" autocapitalize="off" autocorrect="off"></div>
+    <label><input type="checkbox" id="cPrev"> Previsualitzar vídeos i models 3D a la llista (gasta dades; amb mala cobertura, treu-ho)</label>
+    <label><input type="checkbox" id="cPres"> Mode presentació (amaga el client: nom genèric i només fitxers publicables)</label>
+    <button id="bDesaConfig">Desar</button>
+    <button id="bSurt" class="sec nomesDropbox">Sortir de Dropbox (esborra l'accés d'aquest mòbil)</button>
+    <button id="bBuidaCau" class="sec">Tornar a llegir tots els projectes</button>
+    <p id="infoConfig" style="font-size:13px"></p>
+  </div>
+</section>
+
+<!-- CERCA GUIADA -->
+<section id="pProjectes" class="pantalla">
+  <div class="guia">
+    <label class="camp"><span>Què busques?</span>
+      <select id="fTipus" class="gran"><option value="">Tot</option></select></label>
+    <label class="camp"><span>De quin tipus d'aplicació?</span>
+      <select id="fSis" class="gran"><option value="">Totes les aplicacions</option></select></label>
+    <div class="dos">
+      <label class="camp"><span>Tipologia</span><select id="fGrup" class="gran"><option value="">Totes</option></select></label>
+      <label class="camp"><span>Any</span><select id="fAny" class="gran"><option value="">Tots</option></select></label>
+    </div>
+    <label class="camp"><span>Paraula (projecte, client, lloc, títol)</span><input id="qCerca" type="search" class="gran" placeholder="opcional"></label>
+    <div class="dos">
+      <label class="xec"><input type="checkbox" id="fDest"> ★ només destacats</label>
+      <label class="xec">Ordre <select id="fOrdre"><option value="dest">destacats i any</option><option value="mod">més recents</option><option value="nom">nom</option></select></label>
+    </div>
+  </div>
+  <div class="progres" id="progres"><i></i></div>
+  <div class="estat" id="estat"></div>
+  <div class="resultats" id="targetes"></div>
+</section>
+
+<!-- FITXA -->
+<section id="pFitxa" class="pantalla fitxa">
+  <h2 id="fNom"></h2>
+  <div class="sub" id="fSub"></div>
+  <div id="fNota" style="margin:0 12px 6px;font-size:14px;color:var(--gris)"></div>
+  <div class="seccio">🎞 Media</div>
+  <div class="graella" id="fMedia"></div>
+  <div class="seccio">📎 Lliurables</div>
+  <div class="llista" id="fLliur"></div>
+  <div style="height:30px"></div>
+</section>
+
+<!-- VISOR -->
+<div class="visor" id="visor">
+  <div class="cap"><button id="vTanca">✕</button><div class="titol" id="vTitol"></div></div>
+  <div class="cos" id="vCos"></div>
+  <div class="nota" id="vNota"></div>
+  <div class="peu">
+    <button id="vEnvia">📤 Enviar</button>
+    <button id="vObre" class="sec" style="display:none">📄 Obrir amb…</button>
+    <a id="vBaixa" class="sec" target="_blank" rel="noopener">⬇ Baixar</a>
+    <a id="vDropbox" class="sec" target="_blank" rel="noopener" style="display:none">🔗 Dropbox</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═════════════ Configuració ═════════════ */
+const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
+const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
+const DB_CAMI = 'dades/oficina_tecnica/biblioteca_projectes/biblioteca_projectes';   // + _rev.json / .json
+/* v0.4 · MODE PANELL: si la pàgina se serveix des del PANELL (…/apps/oficina_tecnica/_mobil/), llegeix els fitxers del disc a
+   través del servidor del PANELL (com la Biblioteca de sempre), sense Dropbox ni entrada. És per PROVAR-LA a l'ordinador. */
+const QS = new URLSearchParams(location.search), DINS = QS.get('dins');
+const LOCAL = /\/apps\/oficina_tecnica\//i.test(location.pathname) || new URLSearchParams(location.search).has('panell');
+/* v0.4 · ACCÉS: comptes de Dropbox que poden fer servir la Biblioteca (en minúscules). Buit = qualsevol compte que tingui la
+   carpeta del PANELL (el control de debò és qui té la carpeta a Dropbox; això és una segona porta). */
+const USUARIS_PERMESOS = [ 'andreuplanes@gmail.com' ];   /* el compte de Dropbox (els DOS mòbils entren amb el MATEIX compte, Andreu 11-12/10) */
+const CFG = { clau: localStorage.getItem('bm.clau') || APP_KEY_DEFECTE, arrel: localStorage.getItem('bm.arrel') || ARREL_DEFECTE, pres: localStorage.getItem('bm.pres') === '1', previes: localStorage.getItem('bm.previes') !== '0', mou3d: localStorage.getItem('bm.mou3d') !== '0' };
+const REDIRECT = location.origin + location.pathname;
+if(LOCAL) CFG.arrel='';   // al PANELL els camins són relatius a l'arrel del servidor (/projectes/…)
+let COMPTE = localStorage.getItem('bm.compte') || '';
+
+/* Mateixes regles que la Biblioteca del PANELL (oficina_biblioteca_projectes v1.7) */
+const GRUPS = { _vidres:'Vidres', _baranes:'Baranes', _materials:'Materials', _interiorisme:'Interiorisme' };
+const SUBS = { MAMPARES:'Mampares', VIDRES:'Vidres', MARQUESINA:'Marquesines', PVT:'Baranes PVT', PBR:'Baranes PBR', CALCUL:'Càlcul de baranes',
+  PORTES:'Portes', PERGOLES:'Pèrgoles', INFRAESTRUCTURA:'Infraestructura', ESCALES:'Escales', PLANOLS:'Plànols', LED:'Il·luminació LED', PRESSUPOSTOS:'Pressupostos' };
+const TIPUS_PROJ = { mampares:'Mampares', pvt:'Baranes PVT', pbr:'Baranes PBR', marquesina:'Marquesines', marquesines:'Marquesines', portes:'Portes', pergoles:'Pèrgoles', vidres:'Vidres' };
+const EXT_VID = ['mp4','webm','mov','m4v'], EXT_IMG = ['png','jpg','jpeg','webp','gif','svg'], EXT_DOC = ['pdf'], EXT_CAD = ['dwg','dxf','skp','3dm','step','stp'], EXT_3D = ['glb','gltf'];
+const FORA = new Set(['_antics','__pycache__','.git','_copies','_paperera']);
+
+let DB = { projectes:{}, fitxers:{} };   // catàleg de la Biblioteca (només lectura)
+let INV = [];                             // [{ ruta, grup, nom, meta, apps[], sisAuto[], media[], lliur[], mod }]
+let CURSOR = null;                        // cursor de list_folder (actualitzacions incrementals)
+let ENTRADES = {};                        // camí (lower) → entrada de Dropbox (per reconstruir l'inventari)
+let OBERT = null;
+const MINIS = new Map();                  // camí → objectURL de la miniatura
+let TOKEN = { access:null, refresh:null, exp:0 };
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function ext(c){ const m=/\.([a-z0-9]+)$/i.exec(c||''); return m?m[1].toLowerCase():''; }
+function tipusDe(c){ const e=ext(c); if(EXT_3D.includes(e)) return '3d'; if(EXT_VID.includes(e)) return 'video'; if(EXT_IMG.includes(e)) return 'imatge'; if(EXT_DOC.includes(e)) return 'doc'; if(EXT_CAD.includes(e)) return 'cad'; return 'altre'; }
+function icona(t){ return {video:'🎬', '3d':'🧊', imatge:'🖼', doc:'📄', cad:'📐', altre:'📎'}[t]||'📎'; }
+function toast(t, ms){ const e=$('toast'); e.textContent=t; e.style.display='block'; clearTimeout(toast._t); toast._t=setTimeout(()=>{ e.style.display='none'; }, ms||3500); }
+function mostra(id){ document.querySelectorAll('.pantalla').forEach(p=>p.classList.toggle('activa', p.id===id)); window.scrollTo(0,0);
+  $('bEnrere').style.display=(id==='pFitxa'||id==='pConfig')?'':'none'; $('bActualitza').style.display=(id==='pProjectes')?'':'none'; }
+
+/* ═════════════ OAuth PKCE amb Dropbox ═════════════ */
+function b64url(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+async function sha256(s){ return crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); }
+async function entra(){
+  if(!CFG.clau){ $('avisClau').style.display=''; return; }
+  const verif=b64url(crypto.getRandomValues(new Uint8Array(48))); sessionStorage.setItem('bm.verif', verif);
+  const chal=b64url(await sha256(verif));
+  const u='https://www.dropbox.com/oauth2/authorize?client_id='+encodeURIComponent(CFG.clau)+'&response_type=code&code_challenge='+chal+'&code_challenge_method=S256&redirect_uri='+encodeURIComponent(REDIRECT)+'&token_access_type=offline';
+  location.href=u;
+}
+async function tokenPost(params){
+  const r=await fetch('https://api.dropboxapi.com/oauth2/token',{ method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(params) });
+  const j=await r.json(); if(!r.ok) throw new Error(j.error_description||j.error||('HTTP '+r.status)); return j;
+}
+async function acabaEntrada(code){
+  const verif=sessionStorage.getItem('bm.verif'); if(!verif) throw new Error('sessió d\'entrada perduda; torna-hi');
+  const j=await tokenPost({ code, grant_type:'authorization_code', code_verifier:verif, client_id:CFG.clau, redirect_uri:REDIRECT });
+  TOKEN={ access:j.access_token, refresh:j.refresh_token||null, exp:Date.now()+(j.expires_in||14400)*1000-60000 }; desaToken();
+  sessionStorage.removeItem('bm.verif'); history.replaceState(null,'',REDIRECT);
+}
+function desaToken(){ localStorage.setItem('bm.token', JSON.stringify(TOKEN)); }
+function llegeixToken(){ try{ TOKEN=JSON.parse(localStorage.getItem('bm.token')||'null')||TOKEN; }catch(e){} }
+async function accessToken(){
+  if(TOKEN.access && Date.now()<TOKEN.exp) return TOKEN.access;
+  if(!TOKEN.refresh) throw new Error('cal entrar');
+  const j=await tokenPost({ grant_type:'refresh_token', refresh_token:TOKEN.refresh, client_id:CFG.clau });
+  TOKEN.access=j.access_token; TOKEN.exp=Date.now()+(j.expires_in||14400)*1000-60000; desaToken(); return TOKEN.access;
+}
+function surt(){ TOKEN={access:null,refresh:null,exp:0}; localStorage.removeItem('bm.token'); mostra('pEntrada'); }
+
+/* ═════════════ API de Dropbox ═════════════ */
+async function rpc(fn, arg){
+  const t=await accessToken();
+  const r=await fetch('https://api.dropboxapi.com/2/'+fn,{ method:'POST', headers:{ Authorization:'Bearer '+t, 'Content-Type':'application/json' }, body:JSON.stringify(arg||null) });
+  if(r.status===401){ TOKEN.access=null; const t2=await accessToken(); const r2=await fetch('https://api.dropboxapi.com/2/'+fn,{ method:'POST', headers:{ Authorization:'Bearer '+t2, 'Content-Type':'application/json' }, body:JSON.stringify(arg||null) }); if(!r2.ok) throw new Error(fn+': HTTP '+r2.status+' '+(await r2.text()).slice(0,200)); return r2.json(); }
+  if(!r.ok) throw new Error(fn+': HTTP '+r.status+' '+(await r.text()).slice(0,200));
+  return r.json();
+}
+async function contingut(fn, arg){   /* content.dropboxapi.com: baixar, miniatures */
+  const t=await accessToken();
+  const r=await fetch('https://content.dropboxapi.com/2/'+fn,{ method:'POST', headers:{ Authorization:'Bearer '+t, 'Dropbox-API-Arg':JSON.stringify(arg) } });
+  if(!r.ok) throw new Error(fn+': HTTP '+r.status); return r;
+}
+function urlLocal(c){ return location.origin+String(c).split('/').map((x,i)=>i?encodeURIComponent(x):'').join('/'); }
+async function baixaJSON(cami){
+  if(LOCAL){ try{ const r=await fetch(urlLocal(cami),{ cache:'no-store' }); return r.ok ? await r.json() : null; }catch(e){ return null; } }
+  try{ const r=await contingut('files/download',{ path:cami }); return await r.json(); }catch(e){ return null; } }
+async function enllacTemporal(cami){ if(LOCAL) return urlLocal(cami); const j=await rpc('files/get_temporary_link',{ path:cami }); return j.link; }
+async function miniatura(cami){
+  if(MINIS.has(cami)) return MINIS.get(cami);
+  if(LOCAL){ const u=tipusDe(cami)==='imatge'?urlLocal(cami):null; MINIS.set(cami,u); return u; }
+  const e=ext(cami); if(!['jpg','jpeg','png','gif','webp','bmp','tif','tiff'].includes(e)){ MINIS.set(cami,null); return null; }
+  try{ const r=await contingut('files/get_thumbnail_v2',{ resource:{ '.tag':'path', path:cami }, format:'jpeg', size:'w256h256', mode:'bestfit' }); const u=URL.createObjectURL(await r.blob()); MINIS.set(cami,u); return u; }
+  catch(e){ MINIS.set(cami,null); return null; }
+}
+
+/* ═════════════ Inventari ═════════════ */
+const arrelProj=()=>CFG.arrel.replace(/\/+$/,'')+'/projectes';
+function progres(p){ const e=$('progres'); e.style.display=p==null?'none':''; e.firstElementChild.style.width=Math.round((p||0)*100)+'%'; }
+/* mode PANELL: el servidor llista les carpetes (HTML) i dona les dates (/dates-fitxers); es fa el mateix llistat pla que Dropbox */
+async function llistaLocal(cami){
+  const r=await fetch(urlLocal(cami)+'/',{ cache:'no-store' }); if(!r.ok) throw new Error('HTTP '+r.status+' · '+cami);
+  const doc=new DOMParser().parseFromString(await r.text(),'text/html'), dirs=[], fits=[];
+  doc.querySelectorAll('a[href]').forEach(a=>{ const hr=a.getAttribute('href'); if(!hr || /^(\?|#|\/|\.\.|[a-z]+:)/i.test(hr)) return; const dir=hr.endsWith('/'); let n; try{ n=decodeURIComponent(dir?hr.slice(0,-1):hr); }catch(e){ n=hr; } if(n && n!=='.') (dir?dirs:fits).push(n); });
+  return { dirs, fits };
+}
+async function llegeixTotLocal(){
+  $('estat').textContent='⏳ llegint els projectes del PANELL…'; progres(0.05); ENTRADES={}; let n=0;
+  const add=(tag,path)=>{ ENTRADES[path.toLowerCase()]={ '.tag':tag, name:path.split('/').pop(), path_lower:path.toLowerCase(), path_display:path }; n++; };
+  const walk=async(cami,prof)=>{ let L; try{ L=await llistaLocal(cami); }catch(e){ return; }
+    L.fits.forEach(f=>add('file',cami+'/'+f)); const D=L.dirs.filter(d=>!FORA.has(d)); D.forEach(d=>add('folder',cami+'/'+d));
+    if(prof<4) await Promise.all(D.map(d=>walk(cami+'/'+d,prof+1))); $('estat').textContent='⏳ '+n+' entrades…'; progres(Math.min(0.5,0.05+n/6000)); };
+  await walk(arrelProj(),0);
+  /* dates (modificació) del servidor del PANELL; si no hi és, sense dates */
+  const F=Object.values(ENTRADES).filter(e=>e['.tag']==='file').map(e=>e.path_display.slice(1));
+  for(let i=0;i<F.length;i+=400){ try{ const r=await fetch('/dates-fitxers',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ rutes:F.slice(i,i+400) }) });
+      if(!r.ok) break; const j=await r.json(); if(!(j && j.ok)) break;
+      Object.entries(j.dates||{}).forEach(([c,d])=>{ const e=ENTRADES[('/'+c).toLowerCase()]; if(e && d && d.mod) e.server_modified=new Date(d.mod).toISOString(); }); }catch(e){ break; } }
+  CURSOR=null; await reconstrueix(); desaCau();
+}
+async function llegeixTot(){
+  if(LOCAL) return llegeixTotLocal();
+  $('estat').textContent='⏳ llegint els projectes de Dropbox…'; progres(0.05);
+  ENTRADES={}; let j=await rpc('files/list_folder',{ path:arrelProj(), recursive:true, limit:2000, include_deleted:false, include_non_downloadable_files:false });
+  let n=0; for(;;){ j.entries.forEach(e=>{ ENTRADES[e.path_lower]=e; }); n+=j.entries.length; $('estat').textContent='⏳ '+n+' entrades…'; progres(Math.min(0.6, 0.05+n/8000));
+    if(!j.has_more) break; j=await rpc('files/list_folder/continue',{ cursor:j.cursor }); }
+  CURSOR=j.cursor; await reconstrueix(); desaCau();
+}
+async function actualitza(){
+  if(LOCAL || !CURSOR) return llegeixTot();
+  $('estat').textContent='⏳ buscant canvis…'; progres(0.1);
+  try{ let j=await rpc('files/list_folder/continue',{ cursor:CURSOR }); let n=0;
+    for(;;){ j.entries.forEach(e=>{ if(e['.tag']==='deleted'){ Object.keys(ENTRADES).forEach(k=>{ if(k===e.path_lower||k.startsWith(e.path_lower+'/')) delete ENTRADES[k]; }); } else ENTRADES[e.path_lower]=e; }); n+=j.entries.length; if(!j.has_more) break; j=await rpc('files/list_folder/continue',{ cursor:j.cursor }); }
+    CURSOR=j.cursor; if(n){ await reconstrueix(); } desaCau(); if(!n){ $('estat').textContent='✓ al dia · '+INV.length+' projectes'; progres(null); pinta(); }
+  }catch(e){ if(/reset/i.test(e.message)){ await llegeixTot(); } else throw e; }
+}
+async function reconstrueix(){
+  /* del llistat pla de Dropbox a l'inventari: projectes/_<grup>/<NOM>/… (mateixes regles que la Biblioteca del PANELL) */
+  const base=arrelProj().toLowerCase()+'/', nou=[], perRuta={};
+  Object.values(ENTRADES).forEach(e=>{ const rel=e.path_lower.slice(base.length); const parts=rel.split('/'); if(parts.length<2) return;
+    const g=parts[0], nom=parts[1]; if(!g.startsWith('_')) return;
+    if(parts.some(x=>FORA.has(x))) return;
+    let p=perRuta[g+'/'+nom]; if(!p){ p=perRuta[g+'/'+nom]={ ruta:'', grup:g, nomCarpeta:nom, nom:nom, meta:{}, apps:[], sisAuto:[], media:[], lliur:[], mod:null, _dirs:new Set() }; }
+    if(parts.length===2){ if(e['.tag']==='folder'){ p.ruta=e.path_display; p.nomCarpeta=e.name; p.nom=e.name; } return; }
+    if(e['.tag']==='folder'){ if(parts.length===3) p._dirs.add(e.name); return; }
+    const pd=e.path_display.split('/'), f=parts[parts.length-1], prof=parts.length-3, dins=pd.slice(pd.length-(parts.length-2), pd.length-1), nomO=pd[pd.length-1];
+    const mod=e.server_modified?Date.parse(e.server_modified):null; if(mod && (!p.mod||mod>p.mod)) p.mod=mod;
+    if(prof===0 && f==='_projecte.json'){ p._meta=e.path_display; return; }
+    const t=tipusDe(f); if(t==='altre' || /_net\.dxf$/i.test(f) || /\.(bak|tmp)$/i.test(f)) return;
+    if(prof>2) return;
+    if(dins[0] && dins[0].toLowerCase()==='media') p.media.push({ cami:e.path_display, nom:nomO, tipus:t, on:dins.join('/'), mod, mida:e.size });
+    else p.lliur.push({ cami:e.path_display, nom:nomO, tipus:t, on:dins.join('/'), mod, mida:e.size }); });
+  const L=Object.values(perRuta).filter(p=>p.ruta);
+  /* _projecte.json (nom, tipus_baranes, data_creacio, ubicacio): es baixen de 6 en 6 */
+  for(let i=0;i<L.length;i+=6){ await Promise.all(L.slice(i,i+6).map(async p=>{ if(p._meta){ p.meta=(await baixaJSON(p._meta))||{}; p.nom=p.meta.nom||p.nomCarpeta; } })); progres(0.6+0.4*Math.min(1,(i+6)/L.length)); $('estat').textContent='⏳ fitxes de projecte '+Math.min(L.length,i+6)+'/'+L.length; }
+  L.forEach(p=>{ const sis=new Set(); if(GRUPS[p.grup]) sis.add(GRUPS[p.grup]);
+    (Array.isArray(p.meta.tipus_baranes)?p.meta.tipus_baranes:[]).forEach(t=>{ const k=String(t||'').toLowerCase(); if(TIPUS_PROJ[k]) sis.add(TIPUS_PROJ[k]); });
+    [...p._dirs].forEach(d=>{ if(d.toUpperCase()==='MEDIA') return; p.apps.push(d); if(SUBS[d.toUpperCase()]) sis.add(SUBS[d.toUpperCase()]); });
+    p.sisAuto=[...sis]; delete p._dirs; delete p._meta;
+    p.media.sort((a,b)=>a.nom.localeCompare(b.nom,'ca')); p.lliur.sort((a,b)=>(a.on+a.nom).localeCompare(b.on+b.nom,'ca')); });
+  INV=L; progres(null); $('estat').textContent='✓ '+INV.length+' projectes · '+INV.reduce((a,p)=>a+p.media.length,0)+' fitxers de MEDIA'; pinta();
+}
+function desaCau(){ try{ localStorage.setItem(LOCAL?'bm.cau.panell':'bm.cau', JSON.stringify({ quan:Date.now(), cursor:CURSOR, entrades:ENTRADES, inv:INV })); }catch(e){ toast('⚠ no cap tot a la memòria del mòbil; es tornarà a llegir cada cop'); } }
+function llegeixCau(){ try{ const c=JSON.parse(localStorage.getItem(LOCAL?'bm.cau.panell':'bm.cau')||'null'); if(c && Array.isArray(c.inv)){ INV=c.inv; CURSOR=c.cursor||null; ENTRADES=c.entrades||{}; return true; } }catch(e){} return false; }
+async function llegeixDB(){ const b=CFG.arrel.replace(/\/+$/,'')+'/'+DB_CAMI; const d=(await baixaJSON(b+'_rev.json'))||(await baixaJSON(b+'.json')); DB={ projectes:(d&&d.projectes)||{}, fitxers:(d&&d.fitxers)||{} }; }
+
+/* ═════════════ Catàleg → el que es mostra ═════════════ */
+function rutaRel(p){ const a=CFG.arrel.replace(/\/+$/,''); return p.ruta.startsWith(a+'/') ? p.ruta.slice(a.length+1) : p.ruta; }
+function camiRel(c){ const a=CFG.arrel.replace(/\/+$/,''); return c.startsWith(a+'/') ? c.slice(a.length+1) : c; }
+function pj(p){ return DB.projectes[rutaRel(p)] || {}; }
+function fx(c){ return DB.fitxers[camiRel(c)] || {}; }
+function sistemesDe(p){ const o=pj(p); const s=new Set((p.sisAuto||[]).filter(x=>!(o.sisMenys||[]).includes(x))); (o.sisMes||[]).forEach(x=>s.add(x)); return [...s]; }
+function anyDe(p){ const m=/^(\d{4})/.exec((p.meta && (p.meta.data_creacio||p.meta.data_actualitzacio))||''); if(m) return m[1]; return p.mod ? String(new Date(p.mod).getFullYear()) : ''; }
+function nomVisible(p){ const o=pj(p); if(CFG.pres) return o.nomGeneric || (sistemesDe(p).join(' · ')||'Projecte')+(p.meta && p.meta.ubicacio ? ' · '+p.meta.ubicacio : ''); return p.nom; }
+function fitxersDe(p){ let F=p.media.concat(p.lliur); if(CFG.pres) F=F.filter(f=>fx(f.cami).publicable); return F; }
+function portadaDe(p){ const o=pj(p); if(o.portada){ const c=CFG.arrel.replace(/\/+$/,'')+'/'+o.portada; if(tipusDe(c)==='imatge') return c; } const im=fitxersDe(p).find(f=>f.tipus==='imatge'); return im?im.cami:null; }
+function dataTx(t){ if(!t) return ''; const d=new Date(t), z=n=>String(n).padStart(2,'0'); return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2); }
+
+/* ═════════════ Llista de projectes ═════════════ */
+/* ═════════════ Cerca guiada: a cada tria, els altres desplegables només ensenyen el que queda (amb el compte) ═════════════ */
+function seleccio(){ return { q:$('qCerca').value.trim().toLowerCase(), g:$('fGrup').value, s:$('fSis').value, a:$('fAny').value, t:$('fTipus').value, d:$('fDest').checked, ord:$('fOrdre').value }; }
+function fitxersQueQuadren(p, S, ignora){   /* fitxers del projecte p que passen la selecció S (sense el camp «ignora», per comptar les opcions) */
+  if(ignora!=='g' && S.g && p.grup!==S.g) return [];
+  if(ignora!=='s' && S.s && !sistemesDe(p).includes(S.s)) return [];
+  if(ignora!=='a' && S.a && anyDe(p)!==S.a) return [];
+  let F=fitxersDe(p); if(ignora!=='t' && S.t) F=F.filter(f=>f.tipus===S.t);
+  if(S.q){ const txP=(nomVisible(p)+' '+(CFG.pres?'':(p.meta.client||''))+' '+sistemesDe(p).join(' ')+' '+(p.meta.ubicacio||'')+' '+(pj(p).nota||'')).toLowerCase();
+    if(!txP.includes(S.q)) F=F.filter(f=>((fx(f.cami).titol||'')+' '+f.nom+' '+(fx(f.cami).nota||'')).toLowerCase().includes(S.q)); }
+  if(ignora!=='d' && S.d) F=F.filter(f=>fx(f.cami).destacat || pj(p).destacat);
+  return F;
+}
+function omplirFiltres(){
+  const S=seleccio(), NOMT={video:'🎬 Vídeos','3d':'🧊 Models 3D (es giren amb el dit)',imatge:'🖼 Imatges',doc:'📄 PDF',cad:'📐 DWG / DXF'};
+  const compta=(ignora, clauDe)=>{ const C={}; let tot=0; INV.forEach(p=>{ const F=fitxersQueQuadren(p,S,ignora); if(!F.length) return; tot+=F.length; const ks=clauDe(p,F); ks.forEach(k=>{ if(!k) return; C[k]=(C[k]||0)+(ignora==='t'?F.filter(f=>f.tipus===k).length:F.length); }); }); C._tot=tot; return C; };
+  const omple=(sel, C, nomTot, text, ordre)=>{ const v=sel.value, tot=C._tot||0; delete C._tot; const ks=Object.keys(C).sort(ordre);
+    sel.innerHTML='<option value="">'+esc(nomTot)+(tot?' ('+tot+')':'')+'</option>'+ks.map(k=>'<option value="'+esc(k)+'">'+esc(text(k))+' ('+C[k]+')</option>').join('');
+    sel.value=ks.includes(v)?v:''; if(sel.value!==v) sel.dataset.reset='1'; };
+  omple($('fTipus'), compta('t',(p,F)=>[...new Set(F.map(f=>f.tipus))]), 'Tot', k=>NOMT[k]||k, (a,b)=>['video','3d','imatge','doc','cad'].indexOf(a)-['video','3d','imatge','doc','cad'].indexOf(b));
+  omple($('fSis'), compta('s',(p,F)=>sistemesDe(p)), 'Totes les aplicacions', k=>k, (a,b)=>a.localeCompare(b,'ca'));
+  omple($('fGrup'), compta('g',(p,F)=>[p.grup]), 'Totes', k=>GRUPS[k]||k, (a,b)=>a.localeCompare(b,'ca'));
+  omple($('fAny'), compta('a',(p,F)=>[anyDe(p)]), 'Tots', k=>k, (a,b)=>b.localeCompare(a));
+}
+const OBERTS=new Set();   /* projectes desplegats a la llista de resultats */
+function pinta(){
+  omplirFiltres();
+  const S=seleccio(), T=$('targetes'); T.innerHTML='';
+  const L=INV.map(p=>({ p, F:fitxersQueQuadren(p,S) })).filter(x=>x.F.length);
+  L.sort((x,y)=>{ const a=x.p, b=y.p; if(S.ord==='nom') return nomVisible(a).localeCompare(nomVisible(b),'ca'); if(S.ord==='mod') return (b.mod||0)-(a.mod||0); const dx=pj(a).destacat?1:0, dy=pj(b).destacat?1:0; if(dx!==dy) return dy-dx; const ax=anyDe(a), ay=anyDe(b); if(ax!==ay) return ay.localeCompare(ax); return (b.mod||0)-(a.mod||0); });
+  const nF=L.reduce((a,x)=>a+x.F.length,0), nP=L.length;
+  /* resum de la tria, en una línia */
+  const NOMT={video:'vídeos','3d':'models 3D',imatge:'imatges',doc:'PDF',cad:'DWG / DXF'}; const parts=[S.t?NOMT[S.t]:'fitxers', S.s||'', S.g?GRUPS[S.g]||S.g:'', S.a||'', S.q?'«'+S.q+'»':'', S.d?'★':''].filter(Boolean);
+  $('estat').innerHTML=nF?('<b>'+nF+' '+parts[0]+'</b>'+(parts.length>1?' · '+esc(parts.slice(1).join(' · ')):'')+' · a <b>'+nP+'</b> projecte'+(nP>1?'s':'')):'';
+  if(!nF){ T.innerHTML='<div class="buit">'+(INV.length?'Res amb aquesta tria. Prova amb menys condicions.':'Encara no s\'ha llegit cap projecte. Prem ↻.')+'</div>'; return; }
+  /* pocs fitxers → tots desplegats; molts → cada projecte plegat (un toc el desplega) */
+  const desplegaTot = nF<=24 || nP===1;
+  L.forEach(({p,F})=>{ const obert=desplegaTot || OBERTS.has(p.ruta);
+    const nV=F.filter(f=>f.tipus==='video').length, n3=F.filter(f=>f.tipus==='3d').length, nI=F.filter(f=>f.tipus==='imatge').length, nD=F.filter(f=>f.tipus==='doc').length, nC=F.filter(f=>f.tipus==='cad').length;
+    const cap=document.createElement('div'); cap.className='grup-proj'+(obert?' obert':'');
+    cap.innerHTML='<div class="n">'+(obert?'▾':'▸')+' '+(pj(p).destacat?'<span class="estrella">★</span> ':'')+esc(nomVisible(p))+'</div><div class="s">'+esc([sistemesDe(p).join(' · ')||GRUPS[p.grup]||'', anyDe(p), [nV?nV+' 🎬':'', n3?n3+' 🧊':'', nI?nI+' 🖼':'', nD?nD+' 📄':'', nC?nC+' 📐':''].filter(Boolean).join(' ')].filter(Boolean).join(' · '))+'</div><button>Fitxa ›</button>';
+    cap.querySelector('button').onclick=e=>{ e.stopPropagation(); obreFitxa(p); };
+    cap.onclick=()=>{ if(OBERTS.has(p.ruta)) OBERTS.delete(p.ruta); else OBERTS.add(p.ruta); pinta(); };
+    T.appendChild(cap); if(!obert) return;
+    F.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fitxer';
+      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
+      el.querySelector('.veure').onclick=()=>obreVisor(f); el.querySelector('.envia').onclick=()=>obreVisor(f, true); T.appendChild(el);
+      demanaPrevia(el.querySelector('.mini2'), f); }); });
+}
+
+/* ═════════════ Fitxa ═════════════ */
+function obreFitxa(p){
+  OBERT=p; $('fNom').innerHTML=(pj(p).destacat?'<span class="estrella">★</span> ':'')+esc(nomVisible(p)); $('titol').textContent=nomVisible(p);
+  const sub=[sistemesDe(p).join(' · '), anyDe(p), CFG.pres?'':(p.meta.client||''), p.meta.ubicacio||''].filter(Boolean).join(' · '); $('fSub').textContent=sub;
+  $('fNota').textContent=pj(p).nota||'';
+  const M=$('fMedia'); M.innerHTML=''; const med=fitxersDe(p).filter(f=>f.on.toLowerCase().startsWith('media'));
+  if(!med.length) M.innerHTML='<div class="buit" style="grid-column:1/-1;padding:14px">Sense vídeos ni imatges a MEDIA.</div>';
+  med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f); });
+  const Ll=$('fLliur'); Ll.innerHTML=''; const ll=fitxersDe(p).filter(f=>!f.on.toLowerCase().startsWith('media'));
+  if(!ll.length) Ll.innerHTML='<div class="buit" style="padding:14px">Sense lliurables.</div>';
+  ll.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fila'; el.innerHTML='<div class="ic">'+icona(f.tipus)+'</div><div class="t"><div class="n">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="on">'+esc(f.on||'projecte')+(f.mida?' · '+midaTx(f.mida):'')+'</div></div><div class="d">'+dataTx(f.mod)+'</div>'; el.onclick=()=>obreVisor(f); Ll.appendChild(el); if(f.tipus==='doc' || f.tipus==='cad') demanaPrevia(el.querySelector('.ic'), f); });
+  mostra('pFitxa');
+}
+function midaTx(b){ return b>1e9?(b/1e9).toFixed(1)+' GB':b>1e6?(b/1e6).toFixed(1)+' MB':Math.round(b/1e3)+' kB'; }
+
+/* ═════════════ Previsualitzacions (v0.7): només quan la miniatura surt a la pantalla. Vídeo: el navegador en treu el fotograma
+   del segon 0,6 (preload=metadata: baixa poc). 3D: un sol <model-viewer> amagat les fa d'una en una (foto PNG transparent, model quiet =
+   tancat) i es guarden mentre l'app és oberta. Imatge: miniatura de Dropbox (o el fitxer, al PANELL). ═════════════ */
+const PREV_OBS = ('IntersectionObserver' in window) ? new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ PREV_OBS.unobserve(e.target); posaPrevia(e.target); } }), { rootMargin:'250px 0px' }) : null;
+function demanaPrevia(box, f){
+  box._f=f; box.onclick=ev=>{ ev.stopPropagation(); obreVisor(f); };
+  if(f.tipus!=='imatge' && !(CFG.previes && (f.tipus==='video' || f.tipus==='3d' || (f.tipus==='doc' && ext(f.nom)==='pdf' && !(f.mida>PDF_MAX_PREVIA)) || (f.tipus==='cad' && dxfDe(f) && !(dxfDe(f).mida>DXF_MAX_PREVIA))))) return;
+  if(PREV_OBS) PREV_OBS.observe(box); else posaPrevia(box);
+}
+async function posaPrevia(box){
+  const f=box._f; if(!f || box.querySelector('.pv')) return;
+  try{
+    if(f.tipus==='imatge'){ const u=await miniatura(f.cami); if(u) box.insertAdjacentHTML('afterbegin','<img class="pv" src="'+u+'" alt="">'); }
+    else if(f.tipus==='video'){ const u=await enllacTemporal(f.cami); const v=document.createElement('video');
+      v.className='pv'; v.muted=true; v.playsInline=true; v.setAttribute('playsinline',''); v.setAttribute('muted',''); v.preload='metadata'; v.disablePictureInPicture=true;
+      v.onerror=()=>v.remove(); v.onloadeddata=()=>box.insertAdjacentHTML('beforeend','<span class="pv-marca">▶ vídeo</span>'); v.src=u+'#t=0.6'; box.prepend(v); }
+    else if(f.tipus==='doc'){ const u=await fotoPDF(f); if(u){ box.classList.add('pdf'); box.insertAdjacentHTML('afterbegin','<img class="pv" src="'+u+'" alt="">'); if(!box.classList.contains('ic')) box.insertAdjacentHTML('beforeend','<span class="pv-marca">📄 PDF</span>'); } }
+    else if(f.tipus==='cad'){ const d=dxfDe(f); const u=d?await fotoDXF(d):null; if(u){ box.classList.add('pla'); box.insertAdjacentHTML('afterbegin','<img class="pv" src="'+u+'" alt="">'); if(!box.classList.contains('ic')) box.insertAdjacentHTML('beforeend','<span class="pv-marca">📐 '+ext(f.nom).toUpperCase()+'</span>'); } }
+    else if(f.tipus==='3d'){ const u=await foto3D(f.cami); if(u){ box.classList.add('m3d'); box.insertAdjacentHTML('afterbegin','<img class="pv" src="'+u+'" alt="">'); box.insertAdjacentHTML('beforeend','<span class="pv-marca">🧊 3D</span>'); } }
+  }catch(e){}
+}
+/* ── PDF (v0.8): pdf.js (Mozilla, Apache 2.0) desat al costat; els bytes es guarden (els últims 6) per no baixar dos cops ── */
+const PDF_MAX_PREVIA=15e6;   /* PDF més grossos: sense miniatura (massa dades al mòbil); al visor, sí */
+let _pdfjs=null;
+function carregaPDF(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(!_pdfjs) _pdfjs=new Promise((ok,ko)=>{ const base=LOCAL?'/apps/comu/visorpdf/':new URL('.', location.href).href, sc=document.createElement('script');
+    sc.src=base+'pdf.min.js'; sc.onload=()=>{ if(!window.pdfjsLib) return ko(new Error('pdf.js')); pdfjsLib.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.js'; ok(pdfjsLib); };
+    sc.onerror=()=>{ _pdfjs=null; ko(new Error('no s\'ha pogut carregar el visor de PDF')); }; document.head.appendChild(sc); });
+  return _pdfjs;
+}
+const PDFBYTES=new Map();
+function bytesPDF(f){ if(PDFBYTES.has(f.cami)) return PDFBYTES.get(f.cami);
+  const p=(async()=>{ const u=await enllacTemporal(f.cami); const r=await fetch(u); if(!r.ok) throw new Error('HTTP '+r.status); return await r.arrayBuffer(); })();
+  p.catch(()=>PDFBYTES.delete(f.cami)); PDFBYTES.set(f.cami,p); if(PDFBYTES.size>6) PDFBYTES.delete(PDFBYTES.keys().next().value); return p; }
+async function obrePDF(buf){ const L=await carregaPDF(); return await L.getDocument({ data:new Uint8Array(buf.slice(0)), isEvalSupported:false }).promise; }
+function fotoPDF(f){ const k='pdf:'+f.cami; if(MINIS.has(k)) return MINIS.get(k); const p=_cua3D.then(()=>fesFotoPDF(f)).catch(()=>null); _cua3D=p; MINIS.set(k,p); return p; }
+async function fesFotoPDF(f){
+  const doc=await obrePDF(await bytesPDF(f));
+  try{ const pg=await doc.getPage(1), v0=pg.getViewport({ scale:1 }), sc=260/Math.max(v0.width,v0.height), v=pg.getViewport({ scale:sc });
+    const c=document.createElement('canvas'); c.width=Math.ceil(v.width); c.height=Math.ceil(v.height); const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
+    await pg.render({ canvasContext:x, viewport:v }).promise; const b=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85)); return b?URL.createObjectURL(b):null;
+  } finally { doc.destroy(); }
+}
+/* visor: totes les pàgines, es dibuixen quan s'hi arriba; − / + amplien (1× a 4×) */
+async function visorPDF(C, f, buf){
+  const doc=await obrePDF(buf); if(VF!==f){ doc.destroy(); return; }
+  C.innerHTML='<div class="pdfv"></div><div class="pdfctl"><span>'+doc.numPages+' pàg.</span><button class="menys">−</button><button class="mes">+</button></div>';
+  const V=C.querySelector('.pdfv'); let zoom=1, gen=0; C._pdf=doc;
+  const p1=(await doc.getPage(1)).getViewport({ scale:1 }), rel=p1.height/p1.width;
+  const munta=()=>{ const g=++gen, W=Math.max(200,V.clientWidth-16)*zoom, dpr=Math.min(window.devicePixelRatio||1,2); V.innerHTML='';
+    const obs=new IntersectionObserver(es=>es.forEach(async e=>{ if(!e.isIntersecting) return; obs.unobserve(e.target); const c=e.target;
+      try{ const pg=await doc.getPage(+c.dataset.p); if(g!==gen) return; const v1=pg.getViewport({ scale:1 }), s=W/v1.width, v=pg.getViewport({ scale:s*dpr });
+        c.width=Math.floor(v.width); c.height=Math.floor(v.height); c.style.width=W+'px'; c.style.height=(v1.height*s)+'px';
+        await pg.render({ canvasContext:c.getContext('2d'), viewport:v }).promise; }catch(err){} }), { root:V, rootMargin:'600px 0px' });
+    for(let i=1;i<=doc.numPages;i++){ const c=document.createElement('canvas'); c.dataset.p=i; c.width=10; c.height=10; c.style.width=W+'px'; c.style.height=(W*rel)+'px'; V.appendChild(c); obs.observe(c); } };
+  const fesZoom=z=>{ const fr=V.scrollHeight?V.scrollTop/V.scrollHeight:0; zoom=Math.max(1,Math.min(4,z)); munta(); V.scrollTop=fr*V.scrollHeight; };
+  C.querySelector('.menys').onclick=()=>fesZoom(zoom/1.5); C.querySelector('.mes').onclick=()=>fesZoom(zoom*1.5);
+  munta();
+}
+/* ── DXF / DWG (v0.9): visor propi del PANELL. El DWG es veu pel seu DXF germà (mateix nom a la mateixa carpeta). ── */
+const DXF_MAX_PREVIA=10e6;
+let _vdxf=null;
+function carregaDXF(){ if(window.VisorDXF) return Promise.resolve(window.VisorDXF);
+  if(!_vdxf) _vdxf=new Promise((ok,ko)=>{ const sc=document.createElement('script'); sc.src=LOCAL?'/apps/comu/visordxf/visordxf.js':new URL('visordxf.js', location.href).href;
+    sc.onload=()=>window.VisorDXF?ok(window.VisorDXF):ko(new Error('visor DXF')); sc.onerror=()=>{ _vdxf=null; ko(new Error('no s\'ha pogut carregar el visor de DXF')); }; document.head.appendChild(sc); });
+  return _vdxf; }
+function dxfDe(f){ /* el DXF que es pot veure per a aquest fitxer: ell mateix (DXF) o el germà del DWG */
+  if(ext(f.nom)==='dxf') return f; if(ext(f.nom)!=='dwg') return null;
+  if(f._dxf!==undefined) return f._dxf; const k=f.cami.replace(/\.dwg$/i,'.dxf').toLowerCase(); let t=null;
+  for(const p of INV){ t=p.media.concat(p.lliur).find(x=>x.cami.toLowerCase()===k); if(t) break; }
+  f._dxf=t||null; return f._dxf; }
+const DXFMINI=new Map();
+function fotoDXF(d){ const k='dxf:'+d.cami; if(MINIS.has(k)) return MINIS.get(k); const p=_cua3D.then(()=>fesFotoDXF(d)).catch(()=>null); _cua3D=p; MINIS.set(k,p); return p; }
+async function fesFotoDXF(d){ const V=await carregaDXF(), M=V.llegeix(await bytesPDF(d)); const c=V.miniatura(M, 260, false); const b=await new Promise(r=>c.toBlob(r,'image/png')); return b?URL.createObjectURL(b):null; }
+async function visorDXF(C, f, d){
+  const V=await carregaDXF(), buf=await bytesPDF(d); if(VF!==f) return; let M;
+  try{ M=V.llegeix(buf); }catch(e){ C.innerHTML='<div class="cad"><div class="gran">📐</div>'+esc(e.message)+'</div>'; return; }
+  if(VF!==f) return; C.innerHTML=''; C._dxf=V.munta(C, M, { fosc:localStorage.getItem('bm.dxfFosc')==='1', enCanviFons:x=>{ try{ localStorage.setItem('bm.dxfFosc',x?'1':'0'); }catch(e){} } });
+  if(d!==f) $('vNota').textContent='Vista del DXF germà ('+d.nom+'): el DWG no es pot dibuixar al mòbil. «📐 Obrir amb…» el porta a AutoCAD o a una altra app.';
+}
+let _cua3D=Promise.resolve();
+function foto3D(cami){ const k='3d:'+cami; if(MINIS.has(k)) return MINIS.get(k); const p=_cua3D.then(()=>fesFoto3D(cami)).catch(()=>null); _cua3D=p; MINIS.set(k,p); return p; }
+async function fesFoto3D(cami){
+  await carregaVisor3D(); if(!customElements.get('model-viewer')) return null;
+  const u=await enllacTemporal(cami), mv=document.createElement('model-viewer');
+  mv.setAttribute('loading','eager'); mv.setAttribute('reveal','auto'); mv.setAttribute('environment-image','neutral'); mv.setAttribute('exposure','1.05');
+  mv.setAttribute('shadow-intensity','1'); mv.setAttribute('camera-orbit','-35deg 60deg auto'); mv.setAttribute('interaction-prompt','none');
+  mv.style.cssText='position:fixed;left:0;top:0;width:240px;height:240px;opacity:0.01;pointer-events:none;z-index:-1;background:transparent';
+  document.body.appendChild(mv);
+  try{
+    await new Promise((ok,ko)=>{ const t=setTimeout(()=>ko(new Error('temps')),45000); mv.addEventListener('load',()=>{ clearTimeout(t); ok(); },{ once:true }); mv.addEventListener('error',()=>{ clearTimeout(t); ko(new Error('model')); },{ once:true }); mv.src=u; });
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(r,120))));
+    const b=await mv.toBlob({ mimeType:'image/png' }); return b ? URL.createObjectURL(b) : null;
+  } finally { mv.remove(); }
+}
+
+/* ═════════════ Visor 3D (v0.6): <model-viewer> (Google, BSD) DESAT AL COSTAT de la pàgina (sense internet); a l'iPhone, «Veure-ho
+   a l'espai» obre el Quick Look de l'iPhone (realitat augmentada, mida real) ═════════════ */
+let _mv=null;
+function carregaVisor3D(){ if(customElements.get('model-viewer')) return Promise.resolve(); if(!_mv) _mv=import(LOCAL ? '/apps/comu/visor3d/model-viewer.min.js' : new URL('model-viewer.min.js', location.href).href).catch(e=>{ _mv=null; toast('⚠ No s\'ha pogut carregar el visor 3D: '+e.message, 8000); }); return _mv; }
+/* «▶ Moviment / ⏸ Quiet» (v0.7). L'animació dels isomètrics de Mampares (v5.64) és: tancat 0,8 s → obrir 4,5 s → aguantar 1,2 s →
+   tancar (i, si hi ha portes, després les portes). Quiet, la barra va de tancat a obert i el deixa on es posi. La tria (moviment o
+   quiet) es recorda en aquest mòbil. */
+/* ── v0.9b · ZOOM CAP AL PUNT ON ETS (Andreu: «si vull centrar-me en una zona és molt difícil») ──
+   El zoom de <model-viewer> s'apropa sempre al centre del model; per anar a un detall calia tocar-lo exactament i després
+   ampliar. Ara el zoom és el nostre (disable-zoom, disable-tap): la roda i el pessic s'apropen AL PUNT DEL MODEL QUE TENS
+   SOTA el ratolí o entre els dits (com un mapa): el punt no es mou de sota i la resta s'hi apropa. Doble toc / doble clic
+   sobre un punt: hi centra la càmera i s'hi apropa (×0,45). ＋ / − apropen al centre; ⤢ torna a la vista inicial. */
+function _cam3D(mv){ try{ mv.jumpCameraToGoal(); }catch(e){}   /* primer acabar qualsevol moviment a mitges: es calcula sobre la posició real */
+  const t=mv.getCameraTarget(), o=mv.getCameraOrbit(), s=Math.sin(o.phi);
+  return { t, o, c:{ x:t.x+o.radius*s*Math.sin(o.theta), y:t.y+o.radius*Math.cos(o.phi), z:t.z+o.radius*s*Math.cos(o.theta) } }; }
+function zoomCap3D(mv, p, f){ const k=_cam3D(mv), t=k.t, o=k.o, rMax=(mv._r0||o.radius)*4;
+  const r=Math.max(0.03, Math.min(rMax, o.radius*f)); f=r/o.radius; if(!p) p=t;
+  const nt={ x:p.x+(t.x-p.x)*f, y:p.y+(t.y-p.y)*f, z:p.z+(t.z-p.z)*f };   /* escalar respecte de p: p es queda on és a la pantalla */
+  mv.cameraTarget=nt.x+'m '+nt.y+'m '+nt.z+'m'; mv.cameraOrbit=o.theta+'rad '+o.phi+'rad '+r+'m'; mv.jumpCameraToGoal(); }
+function apunta3D(mv, p, f){ const c=_cam3D(mv).c, v={ x:c.x-p.x, y:c.y-p.y, z:c.z-p.z }, r=Math.hypot(v.x,v.y,v.z)||0.03;
+  mv.cameraTarget=p.x+'m '+p.y+'m '+p.z+'m'; mv.cameraOrbit=Math.atan2(v.x,v.z)+'rad '+Math.acos(Math.max(-1,Math.min(1,v.y/r)))+'rad '+Math.max(0.03,r*f)+'m'; }
+function punt3D(mv, x, y){ try{ const h=mv.positionAndNormalFromPoint(x,y); return h ? h.position : null; }catch(e){ return null; } }
+function vistaInicial3D(mv){ mv.cameraTarget='auto auto auto'; mv.fieldOfView='auto'; mv.cameraOrbit='-35deg 60deg auto'; }
+function gestos3D(mv){ if(!mv || mv._gestos) return; mv._gestos=true;
+  mv.addEventListener('load',()=>{ try{ mv._r0=mv.getCameraOrbit().radius; }catch(e){} },{ once:true });
+  mv.addEventListener('wheel', e=>{ e.preventDefault(); e.stopPropagation(); zoomCap3D(mv, punt3D(mv,e.clientX,e.clientY), Math.pow(1.0018, e.deltaY)); }, { passive:false, capture:true });
+  let P=null; const dist=(a,b)=>Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
+  mv.addEventListener('touchstart', e=>{ if(e.touches.length===2){ const a=e.touches[0], b=e.touches[1]; P={ d:dist(a,b), p:punt3D(mv,(a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2) }; } else P=null; }, { passive:true, capture:true });
+  mv.addEventListener('touchmove', e=>{ if(!P || e.touches.length!==2) return; const d=dist(e.touches[0], e.touches[1]); if(d>4 && P.d>4) zoomCap3D(mv, P.p, P.d/d); P.d=d; }, { passive:true, capture:true });
+  mv.addEventListener('touchend', e=>{ if(e.touches.length<2) P=null; }, { passive:true, capture:true });
+  let baix=null, t0=0, x0=0, y0=0;
+  mv.addEventListener('pointerdown', e=>{ baix={ x:e.clientX, y:e.clientY, t:Date.now() }; }, { capture:true });
+  mv.addEventListener('pointerup', e=>{ if(!baix) return; const toc=Date.now()-baix.t<300 && Math.hypot(e.clientX-baix.x, e.clientY-baix.y)<10; baix=null; if(!toc) return;
+    const ara=Date.now(); if(ara-t0<400 && Math.hypot(e.clientX-x0, e.clientY-y0)<40){ t0=0; const p=punt3D(mv,e.clientX,e.clientY); if(p) apunta3D(mv,p,0.45); }
+    else { t0=ara; x0=e.clientX; y0=e.clientY; } }, { capture:true }); }
+function zoom3D(mv, Z){ if(!mv || !Z) return; gestos3D(mv);
+  Z.querySelectorAll('button').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); const z=+b.dataset.z;
+    if(z) zoomCap3D(mv, null, z>0 ? 0.6 : 1/0.6); else vistaInicial3D(mv); }; });
+  ['pointerdown','touchstart','mousedown'].forEach(t=>Z.addEventListener(t,e=>e.stopPropagation())); }
+function tempsObert(d){ return d>10 ? 5.2 : Math.max(0, d-0.7); }   /* moment «del tot obert»: amb HSW/FSW ≈5,2 s; només portes, just abans de tancar */
+function control3D(mv){
+  const ctl=$('mv3dCtl'), bp=$('mvPlay'), pos=$('mvPos'); let obert=0;
+  const pinta=()=>{ bp.textContent=CFG.mou3d?'⏸ Quiet':'▶ Moviment'; ctl.querySelectorAll('input,.et').forEach(e=>e.style.visibility=CFG.mou3d?'hidden':''); };
+  const posa=()=>{ mv.pause(); mv.currentTime=tempsObert(mv.duration||0)*obert; };
+  const aplica=()=>{ if(CFG.mou3d) mv.play({ repetitions:Infinity }); else posa(); pinta(); };
+  const recorda=()=>{ try{ localStorage.setItem('bm.mou3d',CFG.mou3d?'1':'0'); }catch(e){} };
+  bp.onclick=()=>{ CFG.mou3d=!CFG.mou3d; recorda(); if(!CFG.mou3d){ obert=0; pos.value=0; } aplica(); };
+  pos.oninput=()=>{ obert=pos.value/1000; if(CFG.mou3d){ CFG.mou3d=false; recorda(); } posa(); pinta(); };
+  ['pointerdown','touchstart','mousedown'].forEach(t=>ctl.addEventListener(t,e=>e.stopPropagation()));
+  mv.addEventListener('load',()=>{ const a=mv.availableAnimations||[]; if(!a.length) return; mv.animationName=a[0]; ctl.style.display=''; aplica(); },{ once:true });
+}
+/* ═════════════ Visor ═════════════ */
+let VF=null, VBLOB=null;
+async function obreVisor(f, enviar){
+  VF=f; VBLOB=null; const o=fx(f.cami); $('vTitol').textContent=(o.titol||f.nom)+(OBERT?'':''); $('vNota').textContent=[o.nota, f.on, f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · ');
+  const C=$('vCos'); C.innerHTML='<div class="cad" style="color:#999">⏳</div>'; $('visor').classList.add('obert');
+  $('vEnvia').disabled=false; $('vEnvia').textContent='📤 Enviar'; $('vObre').style.display='none'; $('vObre').disabled=false; $('vObre').textContent='📄 Obrir amb…'; $('vBaixa').removeAttribute('href'); $('vDropbox').style.display=o.enllac?'':'none'; if(o.enllac) $('vDropbox').href=o.enllac;
+  try{ const u=await enllacTemporal(f.cami); if(VF!==f) return; $('vBaixa').href=u; $('vBaixa').setAttribute('download', f.nom);
+    if(f.tipus==='3d'){ await carregaVisor3D(); if(VF!==f) return;
+      C.innerHTML='<model-viewer src="'+u+'" camera-controls touch-action="none" min-camera-orbit="auto auto 0.03m" min-field-of-view="4deg" disable-zoom disable-tap ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" shadow-intensity="1" shadow-softness="0.8" exposure="1.05" environment-image="neutral" interaction-prompt="none" camera-orbit="-35deg 60deg auto" style="width:100%;height:100%;background:linear-gradient(#dfe9f2,#f4f6f8 60%,#fbfaf7)">'
+        +'<button slot="ar-button" class="ar">📱 Veure-ho a l\'espai</button></model-viewer>'
+        +'<div id="mv3dCtl" style="display:none"><button id="mvPlay"></button><span class="et">tancat</span><input type="range" id="mvPos" min="0" max="1000" value="0"><span class="et">obert</span></div>'
+        +'<div id="mv3dZoom"><button data-z="1" title="Apropar">＋</button><button data-z="-1" title="Allunyar">−</button><button data-z="0" title="Tornar a la vista inicial" style="font-size:20px">⤢</button></div>'
+        +'<div class="ajuda3d">doble toc: anar-hi · pessic: zoom on tens els dits</div>';
+      zoom3D(C.querySelector('model-viewer'), C.querySelector('#mv3dZoom'));
+      control3D(C.querySelector('model-viewer')); }
+    else if(f.tipus==='video') C.innerHTML='<video controls playsinline autoplay src="'+u+'"></video>';
+    else if(f.tipus==='imatge') C.innerHTML='<img src="'+u+'" alt="">';
+    else if(f.tipus==='doc' && ext(f.nom)==='pdf'){ $('vObre').style.display=''; C.innerHTML='<div class="cad" style="color:#999">⏳ obrint el PDF…</div>';
+      try{ const buf=await bytesPDF(f); if(VF!==f) return;
+        VBLOB={ f, file:new File([buf], f.nom, { type:'application/pdf' }) };   /* ja és baixat: Enviar i Obrir amb… van amb un sol toc */
+        await visorPDF(C, f, buf); }
+      catch(e){ if(VF===f) C.innerHTML='<iframe src="'+u+'"></iframe>'; } }
+    else if(f.tipus==='doc') C.innerHTML='<iframe src="'+u+'"></iframe>';
+    else if(f.tipus==='cad' && dxfDe(f)){ $('vObre').style.display=''; $('vObre').textContent='📐 Obrir amb…'; C.innerHTML='<div class="cad" style="color:#999">⏳ obrint el plànol…</div>';
+      try{ const d=dxfDe(f); await visorDXF(C, f, d); if(VF===f && d===f){ const buf=await bytesPDF(f); VBLOB={ f, file:new File([buf], f.nom, { type:'application/dxf' }) }; } }
+      catch(e){ if(VF===f) C.innerHTML='<div class="cad"><div class="gran">📐</div>'+esc(e.message)+'</div>'; } }
+    else { if(f.tipus==='cad'){ $('vObre').style.display=''; $('vObre').textContent='📐 Obrir amb…'; }
+      C.innerHTML='<div class="cad"><div class="gran">'+icona(f.tipus)+'</div>'+esc(f.nom)+'<br><small>'+(ext(f.nom)==='dwg'?'DWG sense DXF germà: «📐 Obrir amb…» el porta a AutoCAD o a una altra app, o envia\'l.':ext(f.nom).toUpperCase()+': al mòbil només es pot enviar o baixar.')+'</small></div>'; }
+  }catch(e){ C.innerHTML='<div class="cad">⚠ '+esc(e.message)+'</div>'; }
+  if(enviar){ if(VBLOB && VBLOB.f===f){ $('vEnvia').textContent='📤 Enviar ara'; toast('Fitxer a punt: prem «Enviar ara».'); } else envia(); }
+}
+function tancaVisor(){ $('visor').classList.remove('obert'); const v=$('vCos').querySelector('video'); if(v) v.pause(); if($('vCos')._pdf){ try{ $('vCos')._pdf.destroy(); }catch(e){} $('vCos')._pdf=null; } if($('vCos')._dxf){ try{ $('vCos')._dxf.destrueix(); }catch(e){} $('vCos')._dxf=null; } $('vCos').innerHTML=''; VF=null; VBLOB=null; }
+/* «Obrir amb…» (v0.8): és el mateix menú de compartir de l'iPhone; allà surten les apps que obren PDF (PDFelement, Llibres,
+   Fitxers…). Si PDFelement no surt a la fila, «Més» i es pot posar a Favorits perquè surti sempre primer. */
+function obreAmb(){ envia('vObre'); }
+async function envia(quin){
+  /* iOS: el menú de compartir només s'obre en resposta a un toc. Primer es baixa el fitxer (asíncron) i el botó passa a «Enviar ara». */
+  const f=VF; if(!f) return; const bid=(typeof quin==='string')?quin:'vEnvia', OBR=bid==='vObre';
+  if(VBLOB && VBLOB.f===f){ try{ await navigator.share({ files:[VBLOB.file], title:fx(f.cami).titol||f.nom }); }catch(e){ if(e && e.name!=='AbortError') toast('No s\'ha pogut enviar: '+e.message); } return; }
+  if(!navigator.canShare){ toast('Aquest navegador no pot compartir fitxers; fes servir ⬇ Baixar.'); return; }
+  const b=$(bid); b.disabled=true; b.textContent='⏳ preparant…';
+  try{ const u=$('vBaixa').getAttribute('href') || await enllacTemporal(f.cami); const r=await fetch(u); if(!r.ok) throw new Error('HTTP '+r.status); const blob=await r.blob();
+    const file=new File([blob], f.nom, { type:blob.type||tipusMime(f.nom) });
+    if(!navigator.canShare({ files:[file] })) throw new Error('el mòbil no admet compartir aquest tipus de fitxer');
+    VBLOB={ f, file }; b.disabled=false; b.textContent=OBR?(f.tipus==='cad'?'📐 Obrir ara':'📄 Obrir ara'):'📤 Enviar ara'; toast('Fitxer a punt: torna a prémer «'+(OBR?'Obrir ara':'Enviar ara')+'».');
+  }catch(e){ b.disabled=false; b.textContent=OBR?(f.tipus==='cad'?'📐 Obrir amb…':'📄 Obrir amb…'):'📤 Enviar'; toast('No s\'ha pogut preparar: '+e.message); }
+}
+function tipusMime(n){ const e=ext(n); return ({mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',webm:'video/webm',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',gif:'image/gif',pdf:'application/pdf',glb:'model/gltf-binary',gltf:'model/gltf+json',dwg:'application/acad',dxf:'application/dxf'})[e]||'application/octet-stream'; }
+
+/* ═════════════ Arrencada ═════════════ */
+async function comprovaCompte(){
+  /* qui ha entrat: el nom i el correu surten a ⚙; si hi ha llista de permesos i no hi és, fora */
+  try{ const a=await rpc('users/get_current_account', null); COMPTE=(a.email||'').toLowerCase(); localStorage.setItem('bm.compte', COMPTE+(a.name&&a.name.display_name?' · '+a.name.display_name:''));
+    if(USUARIS_PERMESOS.length && !USUARIS_PERMESOS.map(x=>x.toLowerCase()).includes(COMPTE)){ surt(); toast('El compte '+COMPTE+' no té accés a la Biblioteca.', 9000); return false; } }
+  catch(e){ /* sense el permís de llegir el compte: no es bloqueja */ }
+  return true;
+}
+async function arrencaLocal(){
+  document.body.classList.add('local'); if(!DINS) $('bTancaPanell').style.display='';   /* «Sense marc» al PANELL: ✕ torna al menú; dins del marc ja hi és a la barra de dalt */ $('titol').textContent=DINS?'Biblioteca de Projectes':'Biblioteca · PANELL (prova)';   // dins del marc d'iPhone, el títol que tindrà al mòbil $('cPres').checked=CFG.pres;
+  mostra('pProjectes'); const hiHaCau=llegeixCau(); if(hiHaCau) pinta();
+  try{ await llegeixDB(); await llegeixTot(); }
+  catch(e){ $('estat').textContent='⚠ '+e.message+' · cal obrir-la amb el PANELL engegat'; progres(null); }
+}
+async function arrenca(){
+  if(LOCAL) return arrencaLocal();
+  llegeixToken();
+  $('cClau').value=CFG.clau; $('cArrel').value=CFG.arrel; $('cPres').checked=CFG.pres; $('cPrev').checked=CFG.previes;
+  const code=new URLSearchParams(location.search).get('code'), err=new URLSearchParams(location.search).get('error_description');
+  if(err){ toast('Dropbox: '+err, 8000); history.replaceState(null,'',REDIRECT); }
+  if(code){ try{ await acabaEntrada(code); if(!(await comprovaCompte())) return; }catch(e){ toast('No s\'ha pogut entrar: '+e.message, 8000); } }
+  if(!TOKEN.refresh && !TOKEN.access){ $('avisClau').style.display=CFG.clau?'none':''; mostra('pEntrada'); return; }
+  /* v0.9c: la porta del compte també en obrir (no només en entrar): si el compte desat no és a la llista, es torna a preguntar a Dropbox */
+  if(USUARIS_PERMESOS.length && !code){ const desat=(localStorage.getItem('bm.compte')||'').split(' · ')[0].toLowerCase();
+    if(!USUARIS_PERMESOS.map(x=>x.toLowerCase()).includes(desat)){ try{ if(!(await comprovaCompte())) return; }catch(e){} } }
+  mostra('pProjectes'); const hiHaCau=llegeixCau(); if(hiHaCau) pinta();
+  try{ await llegeixDB(); if(hiHaCau){ pinta(); await actualitza(); } else await llegeixTot(); }
+  catch(e){ if(/cal entrar|invalid_grant|401/.test(e.message)){ surt(); toast('Cal tornar a entrar a Dropbox.'); } else { $('estat').textContent='⚠ '+e.message; progres(null); toast('⚠ '+e.message, 8000); } }
+}
+$('bEntra').onclick=entra;
+$('bConfig').onclick=()=>{ $('infoConfig').innerHTML=LOCAL?'Mode PANELL (prova a l\'ordinador): llegeix el disc a través del servidor del PANELL. Al mòbil llegirà el Dropbox.'
+    :'Compte: <b>'+esc(localStorage.getItem('bm.compte')||'—')+'</b><br>Pàgina: '+esc(REDIRECT)+' (ha de ser la Redirect URI de l\'app de Dropbox)'; mostra('pConfig'); };
+$('bEnrere').onclick=()=>{ if($('pFitxa').classList.contains('activa')||$('pConfig').classList.contains('activa')){ $('titol').textContent='Biblioteca de Projectes'; mostra(LOCAL||TOKEN.refresh||TOKEN.access?'pProjectes':'pEntrada'); } };
+$('bDesaConfig').onclick=()=>{ CFG.clau=$('cClau').value.trim(); CFG.arrel=$('cArrel').value.trim()||'/PANELL'; if(!CFG.arrel.startsWith('/')) CFG.arrel='/'+CFG.arrel; CFG.pres=$('cPres').checked; CFG.previes=$('cPrev').checked; localStorage.setItem('bm.previes',CFG.previes?'1':'0');
+  localStorage.setItem('bm.clau',CFG.clau); localStorage.setItem('bm.arrel',CFG.arrel); localStorage.setItem('bm.pres',CFG.pres?'1':'0'); toast('Desat.'); $('bEnrere').onclick(); pinta(); };
+$('bSurt').onclick=()=>{ localStorage.removeItem('bm.compte'); surt(); toast('Accés esborrat d\'aquest mòbil.'); };
+$('bBuidaCau').onclick=async()=>{ localStorage.removeItem('bm.cau'); CURSOR=null; ENTRADES={}; INV=[]; mostra('pProjectes'); try{ await llegeixTot(); }catch(e){ toast('⚠ '+e.message,8000); } };
+$('bActualitza').onclick=async()=>{ try{ await llegeixDB(); await actualitza(); toast('Al dia.'); }catch(e){ toast('⚠ '+e.message,8000); } };
+['qCerca','fGrup','fSis','fAny','fTipus','fDest','fOrdre'].forEach(id=>{ $(id).addEventListener('input',pinta); $(id).addEventListener('change',pinta); });
+$('vTanca').onclick=tancaVisor; $('vEnvia').onclick=()=>envia('vEnvia'); $('vObre').onclick=obreAmb;
+window.addEventListener('popstate',()=>{ if($('visor').classList.contains('obert')) tancaVisor(); });
+/* ═════════════ v0.5 · MARC D'iPHONE al PANELL (Andreu: «que surti amb format iPhone, el més real possible») ═════════════
+   A l'ordinador, la pàgina es dibuixa dins d'un iPhone a mida real (punts CSS de l'iPhone: 393 × 852 el 16, 440 × 956 el 16 Pro
+   Max, 375 × 667 l'SE), com una app afegida a la pantalla d'inici (sense barres de Safari): illa dinàmica, barra d'estat amb
+   l'hora, indicador d'inici, cantonades i zones segures de cada model. Dins hi ha la MATEIXA pàgina (iframe ?dins=…). */
+const MODELS = { i16:{ nom:'iPhone 16', w:393, h:852, sat:54, sab:34, r:55, illa:true }, max:{ nom:'iPhone 16 Pro Max', w:440, h:956, sat:59, sab:34, r:62, illa:true },
+  se:{ nom:'iPhone SE', w:375, h:667, sat:20, sab:0, r:0, illa:false } };
+if(DINS && MODELS[DINS]){ const M=MODELS[DINS]; document.documentElement.classList.add('dins'); document.documentElement.style.setProperty('--sat', M.sat+'px'); document.documentElement.style.setProperty('--sab', M.sab+'px'); }
+/* ✕ Tancar · tornar al PANELL (v0.8a). El coordinador obre l'app en una pestanya NOVA i es queda obert a la seva: si aquí es
+   tornés a carregar el coordinador, n'hi hauria dos i surt l'avís «Ja tens el PANELL obert en una altra pestanya». Per això:
+   es tanca aquesta pestanya i es torna a la del PANELL. Només si el navegador no la deixa tancar (no l'ha oberta el PANELL), es
+   va al menú en aquesta mateixa pestanya, i, si el PANELL ja és obert en una altra, s'avisa en lloc de duplicar-lo. */
+function tancaApp(ev){
+  if(ev) ev.preventDefault();
+  let op=null; try{ op=(window.opener && !window.opener.closed) ? window.opener : null; }catch(e){}
+  try{ if(op) op.focus(); }catch(e){}
+  try{ window.close(); }catch(e){}
+  setTimeout(()=>{ if(window.closed) return;
+    if(op){ avisTanca('El PANELL és obert a l\'altra pestanya. Tanca aquesta (Ctrl+W) i hi tornes.'); return; }
+    location.href=location.origin+'/sistema/coordinador.html'; }, 300);
+  return false;
+}
+function avisTanca(t){ let e=document.getElementById('avisTanca'); if(!e){ e=document.createElement('div'); e.id='avisTanca';
+  e.style.cssText='position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:99;background:#1f3a5f;color:#fff;padding:12px 18px;border-radius:10px;font:15px -apple-system,Segoe UI,Arial;box-shadow:0 6px 20px rgba(0,0,0,.4);max-width:90vw;text-align:center';
+  document.body.appendChild(e); } e.textContent=t; clearTimeout(avisTanca._t); avisTanca._t=setTimeout(()=>e.remove(), 7000); }
+function montaMarc(){
+  let mk=localStorage.getItem('bm.model'); if(!MODELS[mk]) mk='i16';
+  document.title='Biblioteca · iPhone (prova)';
+  document.body.className=''; document.body.innerHTML=`
+<style>
+html,body{ background:#2b2d31 !important; max-width:none !important; box-shadow:none !important; margin:0; height:100%; overflow:hidden; }
+.escena{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+.barra{ position:fixed; top:12px; left:16px; right:16px; display:flex; gap:10px; align-items:center; color:#c9cbd1; font:14px -apple-system,Segoe UI,Arial; z-index:3; }
+.barra b{ color:#fff; } .barra select,.barra button,.barra a{ font:14px -apple-system,Segoe UI,Arial; background:#3a3d44; color:#fff; border:1px solid #555a63; border-radius:8px; padding:6px 10px; text-decoration:none; }
+.barra .esp{ flex:1; }
+.telefon{ position:relative; background:#0d0d0f; box-shadow:0 0 0 2px #3c3f46, 0 0 0 4px #1b1c20, 0 30px 80px rgba(0,0,0,.6); transform-origin:center center; }
+.pantallaT{ position:absolute; overflow:hidden; background:#000; }
+.pantallaT iframe{ width:100%; height:100%; border:0; display:block; background:#f4f3ee; }
+.estatT{ position:absolute; left:0; right:0; top:0; display:flex; justify-content:space-between; align-items:center; color:#fff; font:600 16px -apple-system,Segoe UI,Arial; pointer-events:none; z-index:2; }
+.estatT .ic{ display:flex; gap:6px; align-items:center; }
+.illa{ position:absolute; left:50%; transform:translateX(-50%); background:#000; border-radius:20px; z-index:3; pointer-events:none; }
+.inici{ position:absolute; left:50%; transform:translateX(-50%); height:5px; border-radius:3px; background:#8e8e93; mix-blend-mode:difference; z-index:3; pointer-events:none; }
+.boto{ position:absolute; background:#2a2c31; border-radius:3px; }
+.botoSE{ position:absolute; left:50%; transform:translateX(-50%); border-radius:50%; border:3px solid #2a2c31; }
+</style>
+<div class="barra"><b>Biblioteca mòbil · prova a l'ordinador</b><span>com una app de la pantalla d'inici</span><span class="esp"></span>
+  <select id="mModel">${Object.entries(MODELS).map(([k,M])=>'<option value="'+k+'"'+(k===mk?' selected':'')+'>'+M.nom+' · '+M.w+' × '+M.h+'</option>').join('')}</select>
+  <button id="mRecarrega" title="Tornar a obrir l'app">↻</button><a href="?sensemarc=1" title="Sense el marc del telèfon">Sense marc</a><a href="/sistema/coordinador.html" onclick="return tancaApp(event)" title="Tancar l'aplicació i tornar al menú principal del PANELL" style="background:#8a2d2d;border-color:#a94444">✕ Tancar · tornar al PANELL</a></div>
+<div class="escena"><div class="telefon" id="tel"></div></div>`;
+  const pinta=()=>{ const M=MODELS[mk], b=M.illa?14:16, top=M.illa?0:96, bot=M.illa?0:96, W=M.w+2*b, H=M.h+2*b+top+bot;
+    const e=Math.min(1,(innerHeight-90)/H,(innerWidth-40)/W), T=document.getElementById('tel');
+    T.style.width=W+'px'; T.style.height=H+'px'; T.style.borderRadius=(M.illa?M.r+b:58)+'px'; T.style.transform='scale('+e+')'; T.style.marginTop='40px';
+    const ara=new Date(), hora=ara.getHours()+':'+String(ara.getMinutes()).padStart(2,'0');
+    const bat='<svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#fff" opacity=".45"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#fff"/><rect x="25" y="4.5" width="1.6" height="4" rx=".8" fill="#fff" opacity=".45"/></svg>';
+    const cob='<svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#fff"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>';
+    const wifi='<svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 11.5l2.3-2.6a3.3 3.3 0 0 0-4.6 0z" fill="#fff"/><path d="M3.9 6.8a6.6 6.6 0 0 1 9.2 0l-1.5 1.6a4.4 4.4 0 0 0-6.2 0z" fill="#fff"/><path d="M1.2 4a10.4 10.4 0 0 1 14.6 0l-1.5 1.6a8.2 8.2 0 0 0-11.6 0z" fill="#fff"/></svg>';
+    T.innerHTML='<div class="pantallaT" style="left:'+b+'px;top:'+(b+top)+'px;width:'+M.w+'px;height:'+M.h+'px;border-radius:'+M.r+'px">'
+      +'<iframe id="app" src="'+location.pathname+'?dins='+mk+'"></iframe>'
+      +'<div class="estatT" style="height:'+M.sat+'px;padding:'+(M.illa?'0 34px 0 52px':'0 8px 0 10px')+';'+(M.illa?'':'font-size:12px;')+'"><span>'+hora+'</span><span class="ic">'+cob+wifi+bat+'</span></div>'
+      +(M.illa?'<div class="illa" style="top:11px;width:125px;height:37px"></div>':'')
+      +(M.sab?'<div class="inici" style="bottom:8px;width:'+Math.round(M.w*0.36)+'px"></div>':'')+'</div>'
+      +(M.illa?'<div class="boto" style="left:-4px;top:'+Math.round(H*0.2)+'px;width:4px;height:32px"></div><div class="boto" style="left:-4px;top:'+Math.round(H*0.28)+'px;width:4px;height:62px"></div><div class="boto" style="left:-4px;top:'+Math.round(H*0.37)+'px;width:4px;height:62px"></div><div class="boto" style="right:-4px;top:'+Math.round(H*0.3)+'px;width:4px;height:96px"></div>'
+        :'<div class="botoSE" style="bottom:'+Math.round((bot-58)/2)+'px;width:58px;height:58px"></div><div style="position:absolute;left:50%;top:44px;transform:translateX(-50%);width:60px;height:6px;border-radius:3px;background:#2a2c31"></div>');
+  };
+  pinta(); addEventListener('resize',()=>{ const T=document.getElementById('tel'); const M=MODELS[mk], b=M.illa?14:16, H=M.h+2*b+(M.illa?0:192), W=M.w+2*b; T.style.transform='scale('+Math.min(1,(innerHeight-90)/H,(innerWidth-40)/W)+')'; });
+  document.getElementById('mModel').onchange=e=>{ mk=e.target.value; localStorage.setItem('bm.model',mk); pinta(); };
+  document.getElementById('mRecarrega').onclick=()=>pinta();
+  setInterval(()=>{ const s=document.querySelector('.estatT span'); if(s){ const a=new Date(); s.textContent=a.getHours()+':'+String(a.getMinutes()).padStart(2,'0'); } }, 20000);
+}
+if(LOCAL && !DINS && window.top===window && !QS.has('sensemarc') && innerWidth>=700) montaMarc();
+else arrenca();
+</script>
+</body>
+</html>
