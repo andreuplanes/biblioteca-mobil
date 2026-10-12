@@ -3,11 +3,22 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v0.9d (12/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v0.9e (12/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v0.9e: OBERTURA DELS .glb DE PORTES i HORITZONTAL (pla de la sessió de Biblioteca; el mateix que la Biblioteca de Projectes v1.9):
+      · «⏸ Quiet / ▶ Moviment» i la barra tancat — obert llegeixen animations[0].extras dels .glb (Portes v228, FITA 39:
+        { obert, durada }): Quiet = tancat (temps 0), la barra va de 0 a «obert». Abans feien servir tempsObert (pensat per a
+        Mampares): amb una corredera de Portes (7,2 s, oberta als 3 s) la barra arribava als 6,5 s, quan ja s'està tornant a
+        tancar. Sense extras (Mampares, PVT, PBR), com abans. Només es baixa la capçalera JSON del .glb (es talla el flux).
+      · HORITZONTAL (Andreu: «al mirar vídeos o 3D seria convenient poder tenir visualització horitzontal»): la columna de 480 px
+        del centre ara només és per a l'ordinador (ratolí: hover + pointer fine); a l'iPhone girat la pàgina ocupa tota la
+        pantalla, amb les zones segures dels costats (--sal / --sar), i el visor posa la imatge a tota l'alçada amb el títol i
+        els botons en una columna a la dreta. Al PANELL, «⟲ Girar» al marc de l'iPhone per provar-ho.
+      · VERSIÓ A LA VISTA (Andreu: «que surti la versió i així ho tenim clar»): APP_VERSION a ⚙ Configuració (per saber si el
+        mòbil ja té la que s'ha pujat a GitHub) i a la barra del marc de l'iPhone al PANELL.
      v0.9d: el catàleg de la Biblioteca es llegeix del fitxer MÉS RECENT (biblioteca_projectes_rev.json de la cuina o
       biblioteca_projectes.json de patrimoni), per data de Dropbox / del servidor. Preparat per al pas a patrimoni.
     v0.9c: USUARIS_PERMESOS = ['andreuplanes@gmail.com'] (el compte de Dropbox dels dos mòbils): qualsevol altre compte en surt,
@@ -72,7 +83,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <title>Biblioteca de Projectes · mòbil</title>
 <style>
-:root{ --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --blau:#1f3a5f; --blau2:#2d5fa6; --fons:#f4f3ee; --carta:#fff; --text:#1c1c1c; --gris:#6b6a62; --linia:#dcdad2; --verd:#2e7d32; --taronja:#b87000; --verm:#c62828; }
+:root{ --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px); --blau:#1f3a5f; --blau2:#2d5fa6; --fons:#f4f3ee; --carta:#fff; --text:#1c1c1c; --gris:#6b6a62; --linia:#dcdad2; --verd:#2e7d32; --taronja:#b87000; --verm:#c62828; }
 *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body{ margin:0; background:var(--fons); color:var(--text); font:16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
 body{ padding-bottom:var(--sab); }
@@ -81,7 +92,7 @@ header h1{ font-size:17px; margin:0; flex:1; white-space:nowrap; overflow:hidden
 header button, header a#bTancaPanell{ text-decoration:none; }
 header button, header a#bTancaPanell{ background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:8px; padding:8px 10px; font-size:15px; }
 .pantalla{ display:none; }
-@media(min-width:700px){ html{ background:#d9d7cf; } body{ max-width:480px; margin:0 auto; min-height:100vh; box-shadow:0 0 0 1px #c9c7bf,0 10px 40px rgba(0,0,0,.18); }
+@media(min-width:700px) and (hover:hover) and (pointer:fine){ html{ background:#d9d7cf; } body{ max-width:480px; margin:0 auto; min-height:100vh; box-shadow:0 0 0 1px #c9c7bf,0 10px 40px rgba(0,0,0,.18); }
   body .visor{ left:50%; right:auto; width:480px; transform:translateX(-50%); } body .toast{ left:50%; right:auto; width:456px; transform:translateX(-50%); } }
 body.local .nomesDropbox{ display:none !important; }
 html.dins{ background:var(--fons); } html.dins body{ max-width:none; box-shadow:none; }
@@ -178,6 +189,20 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 .visor .peu button.sec, .visor .peu a.sec{ background:rgba(255,255,255,.18); }
 .visor .peu button:disabled{ opacity:.5; }
 .visor .nota{ color:#ccc; font-size:13px; padding:0 12px 6px; background:rgba(0,0,0,.75); }
+/* v0.9e · HORITZONTAL (iPhone girat): imatge a tota l'alçada; títol, nota i botons en una columna a la dreta; zones segures */
+@media (orientation:landscape) and (max-height:560px){
+  body{ padding-left:var(--sal); padding-right:var(--sar); }
+  header{ margin:0 calc(-1 * var(--sar)) 0 calc(-1 * var(--sal)); padding-left:calc(12px + var(--sal)); padding-right:calc(12px + var(--sar)); }
+  .visor.obert{ display:grid; grid-template-columns:minmax(0,1fr) calc(178px + var(--sar)); grid-template-rows:auto minmax(0,1fr) auto; grid-template-areas:'cos cap' 'cos nota' 'cos peu'; }
+  .visor .cos{ grid-area:cos; min-height:0; min-width:0; margin:0 0 var(--sab) var(--sal); }
+  .visor .cap{ grid-area:cap; padding:10px calc(10px + var(--sar)) 4px 10px; background:transparent; align-items:flex-start; }
+  .visor .cap .titol{ white-space:normal; font-size:13px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+  .visor .cap button{ padding:6px 10px; }
+  .visor .nota{ grid-area:nota; overflow:auto; padding:2px calc(10px + var(--sar)) 6px 10px; font-size:12px; background:transparent; }
+  .visor .peu{ grid-area:peu; flex-direction:column; flex-wrap:nowrap; gap:6px; padding:6px calc(10px + var(--sar)) calc(8px + var(--sab)) 10px; background:transparent; }
+  .visor .peu button, .visor .peu a{ flex:none; min-width:0; padding:9px 6px; font-size:14px; }
+  #mv3dCtl{ bottom:24px; } .ajuda3d{ bottom:4px; }
+}
 /* entrada / config */
 .centre{ padding:30px 20px; max-width:480px; margin:0 auto; }
 .centre h2{ margin:0 0 6px; } .centre p{ color:var(--gris); }
@@ -214,7 +239,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 <!-- CONFIG -->
 <section id="pConfig" class="pantalla">
   <div class="centre">
-    <h2>Configuració</h2>
+    <h2>Configuració <span id="cVersio" style="font-size:13px;font-weight:600;color:#fff;background:var(--blau2);border-radius:999px;padding:3px 9px;vertical-align:3px"></span></h2>
     <div class="nomesDropbox"><label>Clau de l'app de Dropbox (App key)</label>
     <input id="cClau" placeholder="p. ex. a1b2c3d4e5f6g7h" autocapitalize="off" autocorrect="off">
     <label>Carpeta del PANELL a Dropbox</label>
@@ -279,6 +304,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
+const APP_VERSION = 'v0.9e';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
 const DB_CAMI = 'dades/oficina_tecnica/biblioteca_projectes/biblioteca_projectes';   // + _rev.json / .json
@@ -668,10 +694,23 @@ function zoom3D(mv, Z){ if(!mv || !Z) return; gestos3D(mv);
     if(z) zoomCap3D(mv, null, z>0 ? 0.6 : 1/0.6); else vistaInicial3D(mv); }; });
   ['pointerdown','touchstart','mousedown'].forEach(t=>Z.addEventListener(t,e=>e.stopPropagation())); }
 function tempsObert(d){ return d>10 ? 5.2 : Math.max(0, d-0.7); }   /* moment «del tot obert»: amb HSW/FSW ≈5,2 s; només portes, just abans de tancar */
+/* v0.9e · Portes v228 (FITA 39) desa animations[0].extras = { obert:<s del tot obert>, durada:<s del cicle> } (batent 7,2 s; vaivé
+   13,8 s amb les dues cares). Es llegeix NOMÉS la capçalera JSON del .glb (uns quants kB: es talla el flux en tenir-la). */
+const EXTRAS3D=new Map();
+function extres3D(u){ if(EXTRAS3D.has(u)) return EXTRAS3D.get(u);
+  const p=(async()=>{ const r=await fetch(u); if(!r.ok || !r.body) return null; const rd=r.body.getReader(); let b=new Uint8Array(0), cal=20;
+    try{ while(b.length<cal){ const x=await rd.read(); if(x.done) break; const n=new Uint8Array(b.length+x.value.length); n.set(b); n.set(x.value,b.length); b=n;
+        if(cal===20 && b.length>=20){ const dv=new DataView(b.buffer); if(dv.getUint32(0,true)!==0x46546C67 || dv.getUint32(16,true)!==0x4E4F534A) return null; cal=20+dv.getUint32(12,true); } } }
+    finally { try{ rd.cancel(); }catch(e){} }
+    if(b.length<cal) return null; const j=JSON.parse(new TextDecoder().decode(b.subarray(20,cal)));
+    const a=(j.animations||[])[0], x=a && a.extras; return (x && +x.obert>0) ? { obert:+x.obert, durada:+x.durada||0 } : null; })().catch(()=>null);
+  EXTRAS3D.set(u,p); return p; }
 function control3D(mv){
-  const ctl=$('mv3dCtl'), bp=$('mvPlay'), pos=$('mvPos'); let obert=0;
+  const ctl=$('mv3dCtl'), bp=$('mvPlay'), pos=$('mvPos'); let obert=0, X=null;
+  extres3D(mv.getAttribute('src')).then(x=>{ X=x; if(!CFG.mou3d && mv.loaded && $('mv3dCtl')===ctl) posa(); });
+  const tObert=()=>X ? Math.min(X.obert, mv.duration||X.obert) : tempsObert(mv.duration||0);   /* v0.9e */
   const pinta=()=>{ bp.textContent=CFG.mou3d?'⏸ Quiet':'▶ Moviment'; ctl.querySelectorAll('input,.et').forEach(e=>e.style.visibility=CFG.mou3d?'hidden':''); };
-  const posa=()=>{ mv.pause(); mv.currentTime=tempsObert(mv.duration||0)*obert; };
+  const posa=()=>{ mv.pause(); mv.currentTime=tObert()*obert; };
   const aplica=()=>{ if(CFG.mou3d) mv.play({ repetitions:Infinity }); else posa(); pinta(); };
   const recorda=()=>{ try{ localStorage.setItem('bm.mou3d',CFG.mou3d?'1':'0'); }catch(e){} };
   bp.onclick=()=>{ CFG.mou3d=!CFG.mou3d; recorda(); if(!CFG.mou3d){ obert=0; pos.value=0; } aplica(); };
@@ -758,7 +797,7 @@ async function arrenca(){
   catch(e){ if(/cal entrar|invalid_grant|401/.test(e.message)){ surt(); toast('Cal tornar a entrar a Dropbox.'); } else { $('estat').textContent='⚠ '+e.message; progres(null); toast('⚠ '+e.message, 8000); } }
 }
 $('bEntra').onclick=entra;
-$('bConfig').onclick=()=>{ $('infoConfig').innerHTML=LOCAL?'Mode PANELL (prova a l\'ordinador): llegeix el disc a través del servidor del PANELL. Al mòbil llegirà el Dropbox.'
+$('bConfig').onclick=()=>{ $('cVersio').textContent=APP_VERSION; $('infoConfig').innerHTML=LOCAL?'Mode PANELL (prova a l\'ordinador): llegeix el disc a través del servidor del PANELL. Al mòbil llegirà el Dropbox.'
     :'Compte: <b>'+esc(localStorage.getItem('bm.compte')||'—')+'</b><br>Pàgina: '+esc(REDIRECT)+' (ha de ser la Redirect URI de l\'app de Dropbox)'; mostra('pConfig'); };
 $('bEnrere').onclick=()=>{ if($('pFitxa').classList.contains('activa')||$('pConfig').classList.contains('activa')){ $('titol').textContent='Biblioteca de Projectes'; mostra(LOCAL||TOKEN.refresh||TOKEN.access?'pProjectes':'pEntrada'); } };
 $('bDesaConfig').onclick=()=>{ CFG.clau=$('cClau').value.trim(); CFG.arrel=$('cArrel').value.trim()||'/PANELL'; if(!CFG.arrel.startsWith('/')) CFG.arrel='/'+CFG.arrel; CFG.pres=$('cPres').checked; CFG.previes=$('cPrev').checked; localStorage.setItem('bm.previes',CFG.previes?'1':'0');
@@ -775,7 +814,9 @@ window.addEventListener('popstate',()=>{ if($('visor').classList.contains('obert
    l'hora, indicador d'inici, cantonades i zones segures de cada model. Dins hi ha la MATEIXA pàgina (iframe ?dins=…). */
 const MODELS = { i16:{ nom:'iPhone 16', w:393, h:852, sat:54, sab:34, r:55, illa:true }, max:{ nom:'iPhone 16 Pro Max', w:440, h:956, sat:59, sab:34, r:62, illa:true },
   se:{ nom:'iPhone SE', w:375, h:667, sat:20, sab:0, r:0, illa:false } };
-if(DINS && MODELS[DINS]){ const M=MODELS[DINS]; document.documentElement.classList.add('dins'); document.documentElement.style.setProperty('--sat', M.sat+'px'); document.documentElement.style.setProperty('--sab', M.sab+'px'); }
+if(DINS && MODELS[DINS]){ const M=MODELS[DINS], H=QS.has('horitz'), R=document.documentElement.style; document.documentElement.classList.add('dins');
+  /* v0.9e · girat: sense barra d'estat; zones segures als dos costats (illa) i indicador d'inici a baix */
+  R.setProperty('--sat', (H?0:M.sat)+'px'); R.setProperty('--sab', (H?(M.sab?21:0):M.sab)+'px'); R.setProperty('--sal', (H&&M.illa?M.sat:0)+'px'); R.setProperty('--sar', (H&&M.illa?M.sat:0)+'px'); }
 /* ✕ Tancar · tornar al PANELL (v0.8a). El coordinador obre l'app en una pestanya NOVA i es queda obert a la seva: si aquí es
    tornés a carregar el coordinador, n'hi hauria dos i surt l'avís «Ja tens el PANELL obert en una altra pestanya». Per això:
    es tanca aquesta pestanya i es torna a la del PANELL. Només si el navegador no la deixa tancar (no l'ha oberta el PANELL), es
@@ -813,26 +854,32 @@ html,body{ background:#2b2d31 !important; max-width:none !important; box-shadow:
 .boto{ position:absolute; background:#2a2c31; border-radius:3px; }
 .botoSE{ position:absolute; left:50%; transform:translateX(-50%); border-radius:50%; border:3px solid #2a2c31; }
 </style>
-<div class="barra"><b>Biblioteca mòbil · prova a l'ordinador</b><span>com una app de la pantalla d'inici</span><span class="esp"></span>
+<div class="barra"><b>Biblioteca mòbil · prova a l'ordinador</b><span style="background:#2d5fa6;color:#fff;border-radius:999px;padding:2px 9px;font-weight:600">${APP_VERSION}</span><span>com una app de la pantalla d'inici</span><span class="esp"></span>
   <select id="mModel">${Object.entries(MODELS).map(([k,M])=>'<option value="'+k+'"'+(k===mk?' selected':'')+'>'+M.nom+' · '+M.w+' × '+M.h+'</option>').join('')}</select>
-  <button id="mRecarrega" title="Tornar a obrir l'app">↻</button><a href="?sensemarc=1" title="Sense el marc del telèfon">Sense marc</a><a href="/sistema/coordinador.html" onclick="return tancaApp(event)" title="Tancar l'aplicació i tornar al menú principal del PANELL" style="background:#8a2d2d;border-color:#a94444">✕ Tancar · tornar al PANELL</a></div>
+  <button id="mGira" title="Girar el telèfon: vertical / horitzontal (v0.9e)">⟲ Girar</button><button id="mRecarrega" title="Tornar a obrir l'app">↻</button><a href="?sensemarc=1" title="Sense el marc del telèfon">Sense marc</a><a href="/sistema/coordinador.html" onclick="return tancaApp(event)" title="Tancar l'aplicació i tornar al menú principal del PANELL" style="background:#8a2d2d;border-color:#a94444">✕ Tancar · tornar al PANELL</a></div>
 <div class="escena"><div class="telefon" id="tel"></div></div>`;
+  let hz=localStorage.getItem('bm.horitz')==='1';
+  /* v0.9e · girat: es gira el telèfon sencer (−90°) i, a dins, la pantalla de l'app +90° (queda dreta, en horitzontal) */
+  const escala=()=>{ const M=MODELS[mk], b=M.illa?14:16, W=M.w+2*b, H=M.h+2*b+(M.illa?0:192), w=hz?H:W, h=hz?W:H;
+    return (hz?'rotate(-90deg) ':'')+'scale('+Math.min(1,(innerHeight-90)/h,(innerWidth-40)/w)+')'; };
   const pinta=()=>{ const M=MODELS[mk], b=M.illa?14:16, top=M.illa?0:96, bot=M.illa?0:96, W=M.w+2*b, H=M.h+2*b+top+bot;
-    const e=Math.min(1,(innerHeight-90)/H,(innerWidth-40)/W), T=document.getElementById('tel');
-    T.style.width=W+'px'; T.style.height=H+'px'; T.style.borderRadius=(M.illa?M.r+b:58)+'px'; T.style.transform='scale('+e+')'; T.style.marginTop='40px';
+    const T=document.getElementById('tel');
+    T.style.width=W+'px'; T.style.height=H+'px'; T.style.borderRadius=(M.illa?M.r+b:58)+'px'; T.style.transform=escala(); T.style.marginTop='40px';
     const ara=new Date(), hora=ara.getHours()+':'+String(ara.getMinutes()).padStart(2,'0');
     const bat='<svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#fff" opacity=".45"/><rect x="2" y="2" width="17" height="9" rx="2" fill="#fff"/><rect x="25" y="4.5" width="1.6" height="4" rx=".8" fill="#fff" opacity=".45"/></svg>';
     const cob='<svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#fff"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#fff"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>';
     const wifi='<svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 11.5l2.3-2.6a3.3 3.3 0 0 0-4.6 0z" fill="#fff"/><path d="M3.9 6.8a6.6 6.6 0 0 1 9.2 0l-1.5 1.6a4.4 4.4 0 0 0-6.2 0z" fill="#fff"/><path d="M1.2 4a10.4 10.4 0 0 1 14.6 0l-1.5 1.6a8.2 8.2 0 0 0-11.6 0z" fill="#fff"/></svg>';
     T.innerHTML='<div class="pantallaT" style="left:'+b+'px;top:'+(b+top)+'px;width:'+M.w+'px;height:'+M.h+'px;border-radius:'+M.r+'px">'
-      +'<iframe id="app" src="'+location.pathname+'?dins='+mk+'"></iframe>'
-      +'<div class="estatT" style="height:'+M.sat+'px;padding:'+(M.illa?'0 34px 0 52px':'0 8px 0 10px')+';'+(M.illa?'':'font-size:12px;')+'"><span>'+hora+'</span><span class="ic">'+cob+wifi+bat+'</span></div>'
+      +(hz ? '<iframe id="app" src="'+location.pathname+'?dins='+mk+'&horitz=1" style="position:absolute;width:'+M.h+'px;height:'+M.w+'px;left:'+((M.w-M.h)/2)+'px;top:'+((M.h-M.w)/2)+'px;transform:rotate(90deg)"></iframe>'
+           : '<iframe id="app" src="'+location.pathname+'?dins='+mk+'"></iframe>')
+      +(hz ? '' : '<div class="estatT" style="height:'+M.sat+'px;padding:'+(M.illa?'0 34px 0 52px':'0 8px 0 10px')+';'+(M.illa?'':'font-size:12px;')+'"><span>'+hora+'</span><span class="ic">'+cob+wifi+bat+'</span></div>')
       +(M.illa?'<div class="illa" style="top:11px;width:125px;height:37px"></div>':'')
-      +(M.sab?'<div class="inici" style="bottom:8px;width:'+Math.round(M.w*0.36)+'px"></div>':'')+'</div>'
+      +(M.sab&&!hz?'<div class="inici" style="bottom:8px;width:'+Math.round(M.w*0.36)+'px"></div>':'')+'</div>'
       +(M.illa?'<div class="boto" style="left:-4px;top:'+Math.round(H*0.2)+'px;width:4px;height:32px"></div><div class="boto" style="left:-4px;top:'+Math.round(H*0.28)+'px;width:4px;height:62px"></div><div class="boto" style="left:-4px;top:'+Math.round(H*0.37)+'px;width:4px;height:62px"></div><div class="boto" style="right:-4px;top:'+Math.round(H*0.3)+'px;width:4px;height:96px"></div>'
         :'<div class="botoSE" style="bottom:'+Math.round((bot-58)/2)+'px;width:58px;height:58px"></div><div style="position:absolute;left:50%;top:44px;transform:translateX(-50%);width:60px;height:6px;border-radius:3px;background:#2a2c31"></div>');
   };
-  pinta(); addEventListener('resize',()=>{ const T=document.getElementById('tel'); const M=MODELS[mk], b=M.illa?14:16, H=M.h+2*b+(M.illa?0:192), W=M.w+2*b; T.style.transform='scale('+Math.min(1,(innerHeight-90)/H,(innerWidth-40)/W)+')'; });
+  pinta(); addEventListener('resize',()=>{ document.getElementById('tel').style.transform=escala(); });
+  document.getElementById('mGira').onclick=()=>{ hz=!hz; try{ localStorage.setItem('bm.horitz',hz?'1':'0'); }catch(e){} pinta(); };
   document.getElementById('mModel').onchange=e=>{ mk=e.target.value; localStorage.setItem('bm.model',mk); pinta(); };
   document.getElementById('mRecarrega').onclick=()=>pinta();
   setInterval(()=>{ const s=document.querySelector('.estatT span'); if(s){ const a=new Date(); s.textContent=a.getHours()+':'+String(a.getMinutes()).padStart(2,'0'); } }, 20000);
