@@ -3,11 +3,32 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v0.9e (12/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v2.3 (13/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v2.3: 3D — MOURE AMB DOS DITS (Andreu: «si faig zoom amb els dos dits no puc moure lateralment el disseny… per centrar el que
+      vull veure»). Amb dos dits, a la vegada: separar / ajuntar = zoom cap al punt que hi ha entre els dits, i ARROSSEGAR = desplaçar
+      el model (com un mapa: el punt de sota els dits els segueix). El desplaçament propi de model-viewer es desactiva al mòbil
+      (disable-pan) perquè no es barregi amb el nostre. Un dit continua girant; doble toc, anar-hi. Biblioteca de Projectes: v2.3
+      (mateix número; allà sense canvis).
+     v2.2: la VERSIÓ al costat del títol, a la capçalera (Andreu: «seria interessant veure al mòbil quina versió tenim»), sempre
+      visible, també a l'iPhone. Biblioteca de Projectes: v2.2 (mateix número; allà sense canvis).
+     v2.1: 📘 FITXES TÈCNIQUES DE PRODUCTE (Andreu: «trio fitxa i idioma i la descarrego per enviar per WhatsApp o per llegir-la»).
+      A «Què busques?», l'opció «📘 Fitxes tècniques»: surten dos desplegables, Família (PBR · PVT · PUNT-FIX · BASE-FIX · documents
+      generals · fitxes noves) i Idioma (CA ES FR EN PT DE; es recorda), i la paraula serveix per buscar el codi («3N»). Llegeix NOMÉS
+      el catàleg de l'app de Fitxes (dades/oficina_tecnica/fitxes_tecniques/fitxes_tecniques.json) i les fitxes noves de
+      GENERADES/<idioma>/; de Dropbox en treu també la mida (el TechBook fa 30-50 MB: es diu i no se'n fa miniatura). Mateix visor
+      (‹ › i lliscar per la fitxa següent en el mateix idioma), 📤 Enviar, 📄 Obrir amb… i ⬇ Baixar. Biblioteca de Projectes: v2.1.
+     v2.0: PASSAR D'UN FITXER AL SEGÜENT SENSE SORTIR DEL VISOR (Andreu: «quan hi ha molts informes seria molt més fluid anar-los
+      passant o bé empenyent a dreta i esquerra»). A la capçalera del visor, ‹ 3 / 12 › (girat: en una fila sota el títol); LLISCAR
+      el dit a dreta / esquerra sobre el fitxer (no al 3D ni al plànol DXF, on lliscar ja gira o mou el dibuix; al PDF, només si no
+      està ampliat); fletxes ← → del teclat (al PANELL). Es recorren els fitxers de la llista d'on s'ha obert, en el mateix ordre:
+      els resultats de la cerca (amb els filtres triats, també els dels projectes plegats), els de MEDIA de la fitxa o els seus
+      lliurables. S'atura al primer i a l'últim. Si el següent és un PDF o un DXF, es comença a baixar mentre mires l'actual.
+      NUMERACIÓ: des d'ara la Biblioteca Mòbil i la Biblioteca de Projectes porten el MATEIX número de versió: totes dues v2.0
+      (la Mòbil salta de la v0.9e a la v2.0).
      v0.9e: OBERTURA DELS .glb DE PORTES i HORITZONTAL (pla de la sessió de Biblioteca; el mateix que la Biblioteca de Projectes v1.9):
       · «⏸ Quiet / ▶ Moviment» i la barra tancat — obert llegeixen animations[0].extras dels .glb (Portes v228, FITA 39:
         { obert, durada }): Quiet = tancat (temps 0), la barra va de 0 a «obert». Abans feien servir tempsObert (pensat per a
@@ -88,7 +109,8 @@
 html,body{ margin:0; background:var(--fons); color:var(--text); font:16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
 body{ padding-bottom:var(--sab); }
 header{ position:sticky; top:0; z-index:5; background:var(--blau); color:#fff; padding:calc(10px + var(--sat)) 12px 10px; display:flex; align-items:center; gap:10px; }
-header h1{ font-size:17px; margin:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+header .hver{ flex:none; font-size:11px; font-weight:600; color:#fff; background:rgba(255,255,255,.18); border-radius:999px; padding:3px 8px; margin:0 auto 0 -2px; }   /* v2.2 */
+header h1{ font-size:17px; margin:0; flex:0 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 header button, header a#bTancaPanell{ text-decoration:none; }
 header button, header a#bTancaPanell{ background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:8px; padding:8px 10px; font-size:15px; }
 .pantalla{ display:none; }
@@ -115,6 +137,7 @@ html.dins ::-webkit-scrollbar{ display:none; } html.dins{ scrollbar-width:none; 
 .estrella{ color:var(--taronja); }
 .estat{ padding:6px 12px 10px; color:var(--gris); font-size:13px; }
 /* cerca guiada */
+.guia.ft .noft{ display:none; } .guia:not(.ft) .ftcamps{ display:none; }   /* v2.1 */
 .guia{ padding:12px 12px 4px; display:flex; flex-direction:column; gap:10px; }
 .camp{ display:block; } .camp>span{ display:block; font-size:14px; font-weight:600; color:var(--gris); margin:0 0 4px 2px; }
 .gran{ width:100%; font-size:18px; padding:13px 12px; border:1px solid var(--linia); border-radius:12px; background:#fff; color:var(--text); -webkit-appearance:none; appearance:none; }
@@ -160,6 +183,11 @@ select.gran{ background-image:linear-gradient(45deg,transparent 50%,var(--blau2)
 .visor .cap{ color:#fff; padding:calc(10px + var(--sat)) 12px 8px; display:flex; align-items:center; gap:10px; background:rgba(0,0,0,.6); }
 .visor .cap .titol{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:15px; }
 .visor .cap button{ background:rgba(255,255,255,.18); color:#fff; border:0; border-radius:8px; padding:8px 12px; font-size:15px; }
+/* v2.0 · anterior / següent */
+.vnav{ display:none; align-items:center; gap:6px; flex:none; } .vnav.si{ display:flex; }
+.vnav span{ color:#ddd; font-size:13px; min-width:46px; text-align:center; white-space:nowrap; }
+.visor .cap .vnav button{ font-size:20px; font-weight:700; line-height:1; padding:6px 13px; }
+.visor .cap .vnav button:disabled{ opacity:.3; }
 .visor .cos{ flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; }
 .visor .cos video, .visor .cos img{ max-width:100%; max-height:100%; }
 .visor .cos iframe{ width:100%; height:100%; border:0; background:#fff; }
@@ -198,6 +226,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
   .visor .cap{ grid-area:cap; padding:10px calc(10px + var(--sar)) 4px 10px; background:transparent; align-items:flex-start; }
   .visor .cap .titol{ white-space:normal; font-size:13px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
   .visor .cap button{ padding:6px 10px; }
+  .visor .cap{ flex-wrap:wrap; } .vnav.si{ order:3; width:100%; justify-content:space-between; margin-top:6px; }
   .visor .nota{ grid-area:nota; overflow:auto; padding:2px calc(10px + var(--sar)) 6px 10px; font-size:12px; background:transparent; }
   .visor .peu{ grid-area:peu; flex-direction:column; flex-wrap:nowrap; gap:6px; padding:6px calc(10px + var(--sar)) calc(8px + var(--sab)) 10px; background:transparent; }
   .visor .peu button, .visor .peu a{ flex:none; min-width:0; padding:9px 6px; font-size:14px; }
@@ -219,7 +248,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <header>
   <button id="bEnrere" style="display:none">‹</button>
-  <h1 id="titol">Biblioteca de Projectes</h1>
+  <h1 id="titol">Biblioteca de Projectes</h1><span id="hVer" class="hver"></span>
   <button id="bActualitza" title="Actualitzar des de Dropbox">↻</button>
   <a id="bTancaPanell" href="/sistema/coordinador.html" onclick="return tancaApp(event)" title="Tancar i tornar al menú principal del PANELL" style="display:none">✕</a>
   <button id="bConfig" title="Configuració">⚙</button>
@@ -258,14 +287,18 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
   <div class="guia">
     <label class="camp"><span>Què busques?</span>
       <select id="fTipus" class="gran"><option value="">Tot</option></select></label>
-    <label class="camp"><span>De quin tipus d'aplicació?</span>
+    <div class="dos ftcamps">
+      <label class="camp"><span>Família</span><select id="ftFam" class="gran"></select></label>
+      <label class="camp"><span>Idioma</span><select id="ftId" class="gran"><option value="CA">Català</option><option value="ES">Castellà</option><option value="FR">Francès</option><option value="EN">Anglès</option><option value="PT">Portuguès</option><option value="DE">Alemany</option></select></label>
+    </div>
+    <label class="camp noft"><span>De quin tipus d'aplicació?</span>
       <select id="fSis" class="gran"><option value="">Totes les aplicacions</option></select></label>
-    <div class="dos">
+    <div class="dos noft">
       <label class="camp"><span>Tipologia</span><select id="fGrup" class="gran"><option value="">Totes</option></select></label>
       <label class="camp"><span>Any</span><select id="fAny" class="gran"><option value="">Tots</option></select></label>
     </div>
     <label class="camp"><span>Paraula (projecte, client, lloc, títol)</span><input id="qCerca" type="search" class="gran" placeholder="opcional"></label>
-    <div class="dos">
+    <div class="dos noft">
       <label class="xec"><input type="checkbox" id="fDest"> ★ només destacats</label>
       <label class="xec">Ordre <select id="fOrdre"><option value="dest">destacats i any</option><option value="mod">més recents</option><option value="nom">nom</option></select></label>
     </div>
@@ -289,7 +322,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <!-- VISOR -->
 <div class="visor" id="visor">
-  <div class="cap"><button id="vTanca">✕</button><div class="titol" id="vTitol"></div></div>
+  <div class="cap"><button id="vTanca">✕</button><div class="titol" id="vTitol"></div><div class="vnav" id="vNav"><button id="vAnt" aria-label="Anterior">‹</button><span id="vCompt"></span><button id="vSeg" aria-label="Següent">›</button></div></div>
   <div class="cos" id="vCos"></div>
   <div class="nota" id="vNota"></div>
   <div class="peu">
@@ -304,7 +337,8 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v0.9e';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v2.3';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
 const DB_CAMI = 'dades/oficina_tecnica/biblioteca_projectes/biblioteca_projectes';   // + _rev.json / .json
@@ -511,15 +545,66 @@ function omplirFiltres(){
   const omple=(sel, C, nomTot, text, ordre)=>{ const v=sel.value, tot=C._tot||0; delete C._tot; const ks=Object.keys(C).sort(ordre);
     sel.innerHTML='<option value="">'+esc(nomTot)+(tot?' ('+tot+')':'')+'</option>'+ks.map(k=>'<option value="'+esc(k)+'">'+esc(text(k))+' ('+C[k]+')</option>').join('');
     sel.value=ks.includes(v)?v:''; if(sel.value!==v) sel.dataset.reset='1'; };
+  const tv=$('fTipus').value;
   omple($('fTipus'), compta('t',(p,F)=>[...new Set(F.map(f=>f.tipus))]), 'Tot', k=>NOMT[k]||k, (a,b)=>['video','3d','imatge','doc','cad'].indexOf(a)-['video','3d','imatge','doc','cad'].indexOf(b));
+  $('fTipus').insertAdjacentHTML('beforeend','<option value="fitxes">📘 Fitxes tècniques</option>'); if(tv==='fitxes') $('fTipus').value='fitxes';   /* v2.1 */
   omple($('fSis'), compta('s',(p,F)=>sistemesDe(p)), 'Totes les aplicacions', k=>k, (a,b)=>a.localeCompare(b,'ca'));
   omple($('fGrup'), compta('g',(p,F)=>[p.grup]), 'Totes', k=>GRUPS[k]||k, (a,b)=>a.localeCompare(b,'ca'));
   omple($('fAny'), compta('a',(p,F)=>[anyDe(p)]), 'Tots', k=>k, (a,b)=>b.localeCompare(a));
+}
+/* ═════════════ v2.1 · FITXES TÈCNIQUES DE PRODUCTE (de l'app «Fitxes Tècniques de Producte»; NOMÉS LECTURA) ═════════════ */
+const FT_DIR='dades/oficina_tecnica/fitxes_tecniques', FT_IDIOMES=['CA','ES','FR','EN','PT','DE'];
+const FT_NOMID={ CA:'català', ES:'castellà', FR:'francès', EN:'anglès', PT:'portuguès', DE:'alemany' };
+let FT=null, FT_CARR=null, FT_PROVAT=false; const FT_MIDES=new Set();
+try{ const i=localStorage.getItem('bm.ftId'); if(FT_IDIOMES.includes(i)) $('ftId').value=i; }catch(e){}
+function ftBase(){ return CFG.arrel.replace(/\/+$/,'')+'/'+FT_DIR; }
+function ftF(rel, on){ return { cami:ftBase()+'/'+rel, nom:String(rel).split('/').pop(), tipus:'doc', on, mida:null }; }
+async function ftLlistaPdf(dir){   /* els PDF d'una carpeta, amb la mida: [{nom, mida}] */
+  if(LOCAL){ const r=await fetch(urlLocal(dir)+'/',{ cache:'no-store' }); if(!r.ok) return [];
+    const doc=new DOMParser().parseFromString(await r.text(),'text/html');
+    return [...doc.querySelectorAll('a[href]')].map(a=>{ try{ return decodeURIComponent(a.getAttribute('href')); }catch(e){ return ''; } }).filter(n=>/\.pdf$/i.test(n) && !n.includes('/')).map(n=>({ nom:n, mida:null })); }
+  const j=await rpc('files/list_folder',{ path:dir }); return (j.entries||[]).filter(e=>e['.tag']==='file' && /\.pdf$/i.test(e.name)).map(e=>({ nom:e.name, mida:e.size })); }
+function carregaFitxes(){ if(FT_CARR) return FT_CARR;
+  FT_CARR=(async()=>{ const d=await baixaJSON(ftBase()+'/fitxes_tecniques.json'); FT_PROVAT=true; if(!d) return null;
+    const out={ prod:[], gen:{}, noves:{} };
+    (d.productes||[]).forEach(p=>{ const pdf={}; FT_IDIOMES.forEach(i=>{ const x=p.idiomes && p.idiomes[i]; if(x && x.pdf) pdf[i]=ftF(x.pdf, (p.familia||'')+' · '+i); }); out.prod.push({ codi:p.codi||'', familia:p.familia||'', pdf }); });
+    FT_IDIOMES.forEach(i=>{ out.gen[i]=((d.generals||{})[i]||[]).filter(r=>/\.pdf$/i.test(r)).map(r=>ftF(r, 'document general · '+i)); out.noves[i]=null; });
+    FT=out; return out; })().catch(()=>{ FT_PROVAT=true; return null; }).finally(()=>{ FT_CARR=null; });
+  return FT_CARR; }
+async function ftMides(id){   /* mides (Dropbox) de les fitxes d'aquest idioma, i les fitxes noves de GENERADES/<idioma>/ */
+  if(FT_MIDES.has(id) || !FT) return; FT_MIDES.add(id);
+  const tots=FT.prod.map(p=>p.pdf[id]).filter(Boolean).concat(FT.gen[id]||[]), dirs=[...new Set(tots.map(f=>f.cami.slice(0,f.cami.lastIndexOf('/'))))];
+  for(const d of dirs){ try{ const L=await ftLlistaPdf(d), M=new Map(L.map(x=>[x.nom,x.mida])); tots.forEach(f=>{ if(f.cami.startsWith(d+'/') && M.has(f.nom)) f.mida=M.get(f.nom); }); }catch(e){} }
+  try{ FT.noves[id]=(await ftLlistaPdf(ftBase()+'/GENERADES/'+id)).sort((a,b)=>a.nom.localeCompare(b.nom)).map(x=>{ const f=ftF('GENERADES/'+id+'/'+x.nom, 'fitxa nova · '+id); f.mida=x.mida; return f; }); }catch(e){ FT.noves[id]=[]; }
+  tots.forEach(f=>{ if(f.mida==null) f.mida=0; }); }
+function pintaFitxes(){
+  const T=$('targetes'); T.innerHTML='';
+  if(!FT){ T.innerHTML='<div class="buit">'+(FT_CARR || !FT_PROVAT ? '⏳ Llegint el catàleg de fitxes tècniques…' : 'No s\'ha pogut llegir el catàleg de fitxes tècniques.')+'</div>'; $('estat').innerHTML='';
+    if(!FT_CARR && !FT_PROVAT) carregaFitxes().then(()=>{ if($('fTipus').value==='fitxes') pinta(); }); return; }
+  const id=$('ftId').value||'CA'; try{ localStorage.setItem('bm.ftId', id); }catch(e){}
+  if(!FT_MIDES.has(id)){ T.innerHTML='<div class="buit">⏳ Preparant les fitxes en '+FT_NOMID[id]+'…</div>'; ftMides(id).then(()=>{ if($('fTipus').value==='fitxes') pinta(); }); return; }
+  const famV=$('ftFam').value, fams=[...new Set(FT.prod.map(p=>p.familia).filter(Boolean))], nov=FT.noves[id]||[];
+  $('ftFam').innerHTML='<option value="">Totes les famílies</option>'+fams.map(f=>'<option value="'+esc(f)+'">'+esc(f)+'</option>').join('')+'<option value="_gen">Documents generals (TechBook, presentació…)</option>'+(nov.length?'<option value="_nov">Fitxes noves</option>':'');
+  const fam=[...$('ftFam').options].some(o=>o.value===famV) ? famV : ''; $('ftFam').value=fam;
+  const q=$('qCerca').value.trim().toLowerCase(), G=[];
+  if(fam!=='_gen' && fam!=='_nov') fams.filter(f=>!fam || f===fam).forEach(f=>{ const L=FT.prod.filter(p=>p.familia===f && p.pdf[id] && (!q || (p.codi+' '+p.familia).toLowerCase().includes(q))).map(p=>({ t:p.codi, f:p.pdf[id] })); if(L.length) G.push({ nom:f, L }); });
+  if(nov.length && (!fam || fam==='_nov')){ const L=nov.filter(f=>!q || f.nom.toLowerCase().includes(q)).map(f=>({ t:f.nom.replace(/\.pdf$/i,''), f })); if(L.length) G.push({ nom:'✨ Fitxes noves', L }); }
+  if(!fam || fam==='_gen'){ const L=(FT.gen[id]||[]).filter(f=>!q || f.nom.toLowerCase().includes(q)).map(f=>({ t:f.nom.replace(/\.pdf$/i,''), f })); if(L.length) G.push({ nom:'📚 Documents generals', L }); }
+  const SEQ_F=G.flatMap(g=>g.L.map(x=>x.f)), n=SEQ_F.length;
+  $('estat').innerHTML=n ? '<b>'+n+' fitxes</b> · en '+FT_NOMID[id] : '';
+  if(!n){ T.innerHTML='<div class="buit">Cap fitxa amb aquesta tria.</div>'; return; }
+  G.forEach(g=>{ const cap=document.createElement('div'); cap.className='grup-proj obert'; cap.innerHTML='<div class="n">'+esc(g.nom)+'</div><div class="s">'+g.L.length+' · '+FT_NOMID[id]+'</div>'; T.appendChild(cap);
+    g.L.forEach(({t,f})=>{ const el=document.createElement('div'); el.className='fitxer'; const gran=f.mida>PDF_MAX_PREVIA;
+      el.innerHTML='<div class="mini2">📘</div><div class="cos"><div class="t">'+esc(t)+'</div><div class="d">'+esc(['PDF · '+id, f.mida?midaTx(f.mida):'', gran?'document gran':''].filter(Boolean).join(' · '))+'</div><div class="acc"><button class="veure">▶ Veure</button><button class="sec envia">📤 Enviar</button></div></div>';
+      el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_F); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_F); T.appendChild(el);
+      if(!gran && f.mida!=null) demanaPrevia(el.querySelector('.mini2'), f, SEQ_F); }); });
 }
 const OBERTS=new Set();   /* projectes desplegats a la llista de resultats */
 function pinta(){
   omplirFiltres();
   const S=seleccio(), T=$('targetes'); T.innerHTML='';
+  document.querySelector('#pProjectes .guia').classList.toggle('ft', S.t==='fitxes'); const lq=$('qCerca').closest('label').querySelector('span'); if(!lq.dataset.t0) lq.dataset.t0=lq.textContent; lq.textContent = S.t==='fitxes' ? 'Paraula (codi: 3N, PVT, TechBook…)' : lq.dataset.t0;
+  if(S.t==='fitxes') return pintaFitxes();   /* v2.1 */
   const L=INV.map(p=>({ p, F:fitxersQueQuadren(p,S) })).filter(x=>x.F.length);
   L.sort((x,y)=>{ const a=x.p, b=y.p; if(S.ord==='nom') return nomVisible(a).localeCompare(nomVisible(b),'ca'); if(S.ord==='mod') return (b.mod||0)-(a.mod||0); const dx=pj(a).destacat?1:0, dy=pj(b).destacat?1:0; if(dx!==dy) return dy-dx; const ax=anyDe(a), ay=anyDe(b); if(ax!==ay) return ay.localeCompare(ax); return (b.mod||0)-(a.mod||0); });
   const nF=L.reduce((a,x)=>a+x.F.length,0), nP=L.length;
@@ -529,6 +614,7 @@ function pinta(){
   if(!nF){ T.innerHTML='<div class="buit">'+(INV.length?'Res amb aquesta tria. Prova amb menys condicions.':'Encara no s\'ha llegit cap projecte. Prem ↻.')+'</div>'; return; }
   /* pocs fitxers → tots desplegats; molts → cada projecte plegat (un toc el desplega) */
   const desplegaTot = nF<=24 || nP===1;
+  const SEQ_R = L.flatMap(x=>x.F);   /* v2.0: la seqüència del visor = tots els resultats, en aquest ordre */
   L.forEach(({p,F})=>{ const obert=desplegaTot || OBERTS.has(p.ruta);
     const nV=F.filter(f=>f.tipus==='video').length, n3=F.filter(f=>f.tipus==='3d').length, nI=F.filter(f=>f.tipus==='imatge').length, nD=F.filter(f=>f.tipus==='doc').length, nC=F.filter(f=>f.tipus==='cad').length;
     const cap=document.createElement('div'); cap.className='grup-proj'+(obert?' obert':'');
@@ -538,8 +624,8 @@ function pinta(){
     T.appendChild(cap); if(!obert) return;
     F.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fitxer';
       el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
-      el.querySelector('.veure').onclick=()=>obreVisor(f); el.querySelector('.envia').onclick=()=>obreVisor(f, true); T.appendChild(el);
-      demanaPrevia(el.querySelector('.mini2'), f); }); });
+      el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_R); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_R); T.appendChild(el);
+      demanaPrevia(el.querySelector('.mini2'), f, SEQ_R); }); });
 }
 
 /* ═════════════ Fitxa ═════════════ */
@@ -549,10 +635,10 @@ function obreFitxa(p){
   $('fNota').textContent=pj(p).nota||'';
   const M=$('fMedia'); M.innerHTML=''; const med=fitxersDe(p).filter(f=>f.on.toLowerCase().startsWith('media'));
   if(!med.length) M.innerHTML='<div class="buit" style="grid-column:1/-1;padding:14px">Sense vídeos ni imatges a MEDIA.</div>';
-  med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f); });
+  med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f, med); });
   const Ll=$('fLliur'); Ll.innerHTML=''; const ll=fitxersDe(p).filter(f=>!f.on.toLowerCase().startsWith('media'));
   if(!ll.length) Ll.innerHTML='<div class="buit" style="padding:14px">Sense lliurables.</div>';
-  ll.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fila'; el.innerHTML='<div class="ic">'+icona(f.tipus)+'</div><div class="t"><div class="n">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="on">'+esc(f.on||'projecte')+(f.mida?' · '+midaTx(f.mida):'')+'</div></div><div class="d">'+dataTx(f.mod)+'</div>'; el.onclick=()=>obreVisor(f); Ll.appendChild(el); if(f.tipus==='doc' || f.tipus==='cad') demanaPrevia(el.querySelector('.ic'), f); });
+  ll.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fila'; el.innerHTML='<div class="ic">'+icona(f.tipus)+'</div><div class="t"><div class="n">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="on">'+esc(f.on||'projecte')+(f.mida?' · '+midaTx(f.mida):'')+'</div></div><div class="d">'+dataTx(f.mod)+'</div>'; el.onclick=()=>obreVisor(f, false, ll); Ll.appendChild(el); if(f.tipus==='doc' || f.tipus==='cad') demanaPrevia(el.querySelector('.ic'), f, ll); });
   mostra('pFitxa');
 }
 function midaTx(b){ return b>1e9?(b/1e9).toFixed(1)+' GB':b>1e6?(b/1e6).toFixed(1)+' MB':Math.round(b/1e3)+' kB'; }
@@ -561,8 +647,8 @@ function midaTx(b){ return b>1e9?(b/1e9).toFixed(1)+' GB':b>1e6?(b/1e6).toFixed(
    del segon 0,6 (preload=metadata: baixa poc). 3D: un sol <model-viewer> amagat les fa d'una en una (foto PNG transparent, model quiet =
    tancat) i es guarden mentre l'app és oberta. Imatge: miniatura de Dropbox (o el fitxer, al PANELL). ═════════════ */
 const PREV_OBS = ('IntersectionObserver' in window) ? new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ PREV_OBS.unobserve(e.target); posaPrevia(e.target); } }), { rootMargin:'250px 0px' }) : null;
-function demanaPrevia(box, f){
-  box._f=f; box.onclick=ev=>{ ev.stopPropagation(); obreVisor(f); };
+function demanaPrevia(box, f, seq){
+  box._f=f; box.onclick=ev=>{ ev.stopPropagation(); obreVisor(f, false, seq); };
   if(f.tipus!=='imatge' && !(CFG.previes && (f.tipus==='video' || f.tipus==='3d' || (f.tipus==='doc' && ext(f.nom)==='pdf' && !(f.mida>PDF_MAX_PREVIA)) || (f.tipus==='cad' && dxfDe(f) && !(dxfDe(f).mida>DXF_MAX_PREVIA))))) return;
   if(PREV_OBS) PREV_OBS.observe(box); else posaPrevia(box);
 }
@@ -613,7 +699,7 @@ async function visorPDF(C, f, buf){
         c.width=Math.floor(v.width); c.height=Math.floor(v.height); c.style.width=W+'px'; c.style.height=(v1.height*s)+'px';
         await pg.render({ canvasContext:c.getContext('2d'), viewport:v }).promise; }catch(err){} }), { root:V, rootMargin:'600px 0px' });
     for(let i=1;i<=doc.numPages;i++){ const c=document.createElement('canvas'); c.dataset.p=i; c.width=10; c.height=10; c.style.width=W+'px'; c.style.height=(W*rel)+'px'; V.appendChild(c); obs.observe(c); } };
-  const fesZoom=z=>{ const fr=V.scrollHeight?V.scrollTop/V.scrollHeight:0; zoom=Math.max(1,Math.min(4,z)); munta(); V.scrollTop=fr*V.scrollHeight; };
+  const fesZoom=z=>{ const fr=V.scrollHeight?V.scrollTop/V.scrollHeight:0; zoom=Math.max(1,Math.min(4,z)); C._zoom=zoom; munta(); V.scrollTop=fr*V.scrollHeight; };   /* v2.0: C._zoom */
   C.querySelector('.menys').onclick=()=>fesZoom(zoom/1.5); C.querySelector('.mes').onclick=()=>fesZoom(zoom*1.5);
   munta();
 }
@@ -676,13 +762,21 @@ function zoomCap3D(mv, p, f){ const k=_cam3D(mv), t=k.t, o=k.o, rMax=(mv._r0||o.
 function apunta3D(mv, p, f){ const c=_cam3D(mv).c, v={ x:c.x-p.x, y:c.y-p.y, z:c.z-p.z }, r=Math.hypot(v.x,v.y,v.z)||0.03;
   mv.cameraTarget=p.x+'m '+p.y+'m '+p.z+'m'; mv.cameraOrbit=Math.atan2(v.x,v.z)+'rad '+Math.acos(Math.max(-1,Math.min(1,v.y/r)))+'rad '+Math.max(0.03,r*f)+'m'; }
 function punt3D(mv, x, y){ try{ const h=mv.positionAndNormalFromPoint(x,y); return h ? h.position : null; }catch(e){ return null; } }
+/* v2.3: desplaçar el model dx, dy píxels a la pantalla (el que hi ha sota els dits els segueix) */
+function pan3D(mv, dx, dy){ if(!dx && !dy) return; const k=_cam3D(mv), t=k.t, o=k.o, h=mv.clientHeight||1;
+  let fov=30; try{ fov=mv.getFieldOfView(); }catch(e){} const m=2*o.radius*Math.tan(fov*Math.PI/360)/h;
+  const st=Math.sin(o.theta), ct=Math.cos(o.theta), sp=Math.sin(o.phi), cp=Math.cos(o.phi), R={ x:ct, y:0, z:-st }, U={ x:-cp*st, y:sp, z:-cp*ct };
+  const nt={ x:t.x-dx*m*R.x+dy*m*U.x, y:t.y-dx*m*R.y+dy*m*U.y, z:t.z-dx*m*R.z+dy*m*U.z };
+  mv.cameraTarget=nt.x+'m '+nt.y+'m '+nt.z+'m'; mv.jumpCameraToGoal(); }
 function vistaInicial3D(mv){ mv.cameraTarget='auto auto auto'; mv.fieldOfView='auto'; mv.cameraOrbit='-35deg 60deg auto'; }
 function gestos3D(mv){ if(!mv || mv._gestos) return; mv._gestos=true;
   mv.addEventListener('load',()=>{ try{ mv._r0=mv.getCameraOrbit().radius; }catch(e){} },{ once:true });
   mv.addEventListener('wheel', e=>{ e.preventDefault(); e.stopPropagation(); zoomCap3D(mv, punt3D(mv,e.clientX,e.clientY), Math.pow(1.0018, e.deltaY)); }, { passive:false, capture:true });
   let P=null; const dist=(a,b)=>Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-  mv.addEventListener('touchstart', e=>{ if(e.touches.length===2){ const a=e.touches[0], b=e.touches[1]; P={ d:dist(a,b), p:punt3D(mv,(a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2) }; } else P=null; }, { passive:true, capture:true });
-  mv.addEventListener('touchmove', e=>{ if(!P || e.touches.length!==2) return; const d=dist(e.touches[0], e.touches[1]); if(d>4 && P.d>4) zoomCap3D(mv, P.p, P.d/d); P.d=d; }, { passive:true, capture:true });
+  /* v2.3: dos dits = zoom cap al punt + DESPLAÇAR (el centre dels dits arrossega el model) */
+  mv.addEventListener('touchstart', e=>{ if(e.touches.length===2){ const a=e.touches[0], b=e.touches[1], mx=(a.clientX+b.clientX)/2, my=(a.clientY+b.clientY)/2; P={ d:dist(a,b), p:punt3D(mv,mx,my), mx, my }; } else P=null; }, { passive:true, capture:true });
+  mv.addEventListener('touchmove', e=>{ if(!P || e.touches.length!==2) return; const a=e.touches[0], b=e.touches[1], d=dist(a,b), mx=(a.clientX+b.clientX)/2, my=(a.clientY+b.clientY)/2;
+    if(d>4 && P.d>4 && Math.abs(d-P.d)>0.5) zoomCap3D(mv, P.p, P.d/d); pan3D(mv, mx-P.mx, my-P.my); P.d=d; P.mx=mx; P.my=my; }, { passive:true, capture:true });
   mv.addEventListener('touchend', e=>{ if(e.touches.length<2) P=null; }, { passive:true, capture:true });
   let baix=null, t0=0, x0=0, y0=0;
   mv.addEventListener('pointerdown', e=>{ baix={ x:e.clientX, y:e.clientY, t:Date.now() }; }, { capture:true });
@@ -720,17 +814,29 @@ function control3D(mv){
 }
 /* ═════════════ Visor ═════════════ */
 let VF=null, VBLOB=null;
-async function obreVisor(f, enviar){
+/* ═════════════ v2.0 · ANTERIOR / SEGÜENT dins del visor ═════════════ */
+let SEQ=[], SEQI=-1;
+function netejaCos(){ const C=$('vCos'), v=C.querySelector('video'); if(v) v.pause();
+  if(C._pdf){ try{ C._pdf.destroy(); }catch(e){} C._pdf=null; } if(C._dxf){ try{ C._dxf.destrueix(); }catch(e){} C._dxf=null; } C._zoom=1; }
+function pintaNav(){ const n=SEQ.length, si=n>1 && SEQI>=0; $('vNav').classList.toggle('si', si); if(!si) return;
+  $('vCompt').textContent=(SEQI+1)+' / '+n; $('vAnt').disabled=SEQI<=0; $('vSeg').disabled=SEQI>=n-1; }
+function ves(d){ const j=SEQI+d; if(SEQ.length<2 || j<0 || j>=SEQ.length) return; obreVisor(SEQ[j], false, SEQ); }
+function preparaSeguent(){ const g=SEQ[SEQI+1]; if(!g) return;
+  try{ if(g.tipus==='doc' && ext(g.nom)==='pdf' && !(g.mida>PDF_MAX_PREVIA)) bytesPDF(g).catch(()=>{});
+    else if(g.tipus==='cad'){ const d=dxfDe(g); if(d && !(d.mida>DXF_MAX_PREVIA)) bytesPDF(d).catch(()=>{}); } }catch(e){} }
+async function obreVisor(f, enviar, seq){
+  netejaCos(); if(Array.isArray(seq)){ SEQ=seq; } else if(!SEQ.includes(f)) SEQ=[f]; SEQI=SEQ.indexOf(f); if(SEQI<0){ SEQ=[f]; SEQI=0; } pintaNav();
+  if(SEQI+1<SEQ.length) setTimeout(()=>{ if(VF===f) preparaSeguent(); }, 600);
   VF=f; VBLOB=null; const o=fx(f.cami); $('vTitol').textContent=(o.titol||f.nom)+(OBERT?'':''); $('vNota').textContent=[o.nota, f.on, f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · ');
   const C=$('vCos'); C.innerHTML='<div class="cad" style="color:#999">⏳</div>'; $('visor').classList.add('obert');
   $('vEnvia').disabled=false; $('vEnvia').textContent='📤 Enviar'; $('vObre').style.display='none'; $('vObre').disabled=false; $('vObre').textContent='📄 Obrir amb…'; $('vBaixa').removeAttribute('href'); $('vDropbox').style.display=o.enllac?'':'none'; if(o.enllac) $('vDropbox').href=o.enllac;
   try{ const u=await enllacTemporal(f.cami); if(VF!==f) return; $('vBaixa').href=u; $('vBaixa').setAttribute('download', f.nom);
     if(f.tipus==='3d'){ await carregaVisor3D(); if(VF!==f) return;
-      C.innerHTML='<model-viewer src="'+u+'" camera-controls touch-action="none" min-camera-orbit="auto auto 0.03m" min-field-of-view="4deg" disable-zoom disable-tap ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" shadow-intensity="1" shadow-softness="0.8" exposure="1.05" environment-image="neutral" interaction-prompt="none" camera-orbit="-35deg 60deg auto" style="width:100%;height:100%;background:linear-gradient(#dfe9f2,#f4f6f8 60%,#fbfaf7)">'
+      C.innerHTML='<model-viewer src="'+u+'" camera-controls touch-action="none" min-camera-orbit="auto auto 0.03m" min-field-of-view="4deg" disable-zoom disable-tap disable-pan ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" shadow-intensity="1" shadow-softness="0.8" exposure="1.05" environment-image="neutral" interaction-prompt="none" camera-orbit="-35deg 60deg auto" style="width:100%;height:100%;background:linear-gradient(#dfe9f2,#f4f6f8 60%,#fbfaf7)">'
         +'<button slot="ar-button" class="ar">📱 Veure-ho a l\'espai</button></model-viewer>'
         +'<div id="mv3dCtl" style="display:none"><button id="mvPlay"></button><span class="et">tancat</span><input type="range" id="mvPos" min="0" max="1000" value="0"><span class="et">obert</span></div>'
         +'<div id="mv3dZoom"><button data-z="1" title="Apropar">＋</button><button data-z="-1" title="Allunyar">−</button><button data-z="0" title="Tornar a la vista inicial" style="font-size:20px">⤢</button></div>'
-        +'<div class="ajuda3d">doble toc: anar-hi · pessic: zoom on tens els dits</div>';
+        +'<div class="ajuda3d">doble toc: anar-hi · dos dits: zoom i moure</div>';
       zoom3D(C.querySelector('model-viewer'), C.querySelector('#mv3dZoom'));
       control3D(C.querySelector('model-viewer')); }
     else if(f.tipus==='video') C.innerHTML='<video controls playsinline autoplay src="'+u+'"></video>';
@@ -749,7 +855,7 @@ async function obreVisor(f, enviar){
   }catch(e){ C.innerHTML='<div class="cad">⚠ '+esc(e.message)+'</div>'; }
   if(enviar){ if(VBLOB && VBLOB.f===f){ $('vEnvia').textContent='📤 Enviar ara'; toast('Fitxer a punt: prem «Enviar ara».'); } else envia(); }
 }
-function tancaVisor(){ $('visor').classList.remove('obert'); const v=$('vCos').querySelector('video'); if(v) v.pause(); if($('vCos')._pdf){ try{ $('vCos')._pdf.destroy(); }catch(e){} $('vCos')._pdf=null; } if($('vCos')._dxf){ try{ $('vCos')._dxf.destrueix(); }catch(e){} $('vCos')._dxf=null; } $('vCos').innerHTML=''; VF=null; VBLOB=null; }
+function tancaVisor(){ SEQ=[]; SEQI=-1; $('visor').classList.remove('obert'); const v=$('vCos').querySelector('video'); if(v) v.pause(); if($('vCos')._pdf){ try{ $('vCos')._pdf.destroy(); }catch(e){} $('vCos')._pdf=null; } if($('vCos')._dxf){ try{ $('vCos')._dxf.destrueix(); }catch(e){} $('vCos')._dxf=null; } $('vCos').innerHTML=''; VF=null; VBLOB=null; }
 /* «Obrir amb…» (v0.8): és el mateix menú de compartir de l'iPhone; allà surten les apps que obren PDF (PDFelement, Llibres,
    Fitxers…). Si PDFelement no surt a la fila, «Més» i es pot posar a Favorits perquè surti sempre primer. */
 function obreAmb(){ envia('vObre'); }
@@ -805,8 +911,19 @@ $('bDesaConfig').onclick=()=>{ CFG.clau=$('cClau').value.trim(); CFG.arrel=$('cA
 $('bSurt').onclick=()=>{ localStorage.removeItem('bm.compte'); surt(); toast('Accés esborrat d\'aquest mòbil.'); };
 $('bBuidaCau').onclick=async()=>{ localStorage.removeItem('bm.cau'); CURSOR=null; ENTRADES={}; INV=[]; mostra('pProjectes'); try{ await llegeixTot(); }catch(e){ toast('⚠ '+e.message,8000); } };
 $('bActualitza').onclick=async()=>{ try{ await llegeixDB(); await actualitza(); toast('Al dia.'); }catch(e){ toast('⚠ '+e.message,8000); } };
-['qCerca','fGrup','fSis','fAny','fTipus','fDest','fOrdre'].forEach(id=>{ $(id).addEventListener('input',pinta); $(id).addEventListener('change',pinta); });
-$('vTanca').onclick=tancaVisor; $('vEnvia').onclick=()=>envia('vEnvia'); $('vObre').onclick=obreAmb;
+['qCerca','fGrup','fSis','fAny','fTipus','fDest','fOrdre','ftFam','ftId'].forEach(id=>{ $(id).addEventListener('input',pinta); $(id).addEventListener('change',pinta); });
+$('vTanca').onclick=tancaVisor;
+/* v2.0: ‹ › · lliscar a dreta / esquerra (no al 3D ni al DXF; al PDF només sense ampliar) · ← → al teclat */
+$('vAnt').onclick=()=>ves(-1); $('vSeg').onclick=()=>ves(1);
+(()=>{ let t0=null; const C=$('vCos');
+  C.addEventListener('touchstart', e=>{ t0 = e.touches.length===1 ? { x:e.touches[0].clientX, y:e.touches[0].clientY, t:Date.now() } : null; }, { passive:true });
+  C.addEventListener('touchmove', e=>{ if(e.touches.length>1) t0=null; }, { passive:true });
+  C.addEventListener('touchend', e=>{ if(!t0 || !VF) return; const p=e.changedTouches[0], dx=p.clientX-t0.x, dy=p.clientY-t0.y, dt=Date.now()-t0.t; t0=null;
+    if(VF.tipus==='3d' || VF.tipus==='cad' || (C._zoom||1)>1) return;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.6 && dt<700) ves(dx<0 ? 1 : -1); }, { passive:true }); })();
+document.addEventListener('keydown', e=>{ if(!$('visor').classList.contains('obert')) return; const tag=(e.target && e.target.tagName || '').toLowerCase();
+  if(tag==='input' || tag==='textarea' || tag==='select') return;
+  if(e.key==='ArrowRight'){ e.preventDefault(); ves(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); ves(-1); } else if(e.key==='Escape') tancaVisor(); }); $('vEnvia').onclick=()=>envia('vEnvia'); $('vObre').onclick=obreAmb;
 window.addEventListener('popstate',()=>{ if($('visor').classList.contains('obert')) tancaVisor(); });
 /* ═════════════ v0.5 · MARC D'iPHONE al PANELL (Andreu: «que surti amb format iPhone, el més real possible») ═════════════
    A l'ordinador, la pàgina es dibuixa dins d'un iPhone a mida real (punts CSS de l'iPhone: 393 × 852 el 16, 440 × 956 el 16 Pro
