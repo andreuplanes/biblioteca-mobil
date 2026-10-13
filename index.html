@@ -3,11 +3,14 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v2.3 (13/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v2.4 (13/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v2.4: TOTS ELS PROJECTES (Andreu: «vull que surtin tots els projectes», com a l'ordinador). Un projecte sense res per veure
+      al mòbil (p. ex. CALCULS PROVISIONALS, que només té el .json del càlcul) també surt a la llista, amb «sense fitxers per veure
+      al mòbil». Només si la tria no demana un tipus de fitxer ni destacats; en mode presentació NO (no han de sortir carpetes internes).
      v2.3: 3D — MOURE AMB DOS DITS (Andreu: «si faig zoom amb els dos dits no puc moure lateralment el disseny… per centrar el que
       vull veure»). Amb dos dits, a la vegada: separar / ajuntar = zoom cap al punt que hi ha entre els dits, i ARROSSEGAR = desplaçar
       el model (com un mapa: el punt de sota els dits els segueix). El desplaçament propi de model-viewer es desactiva al mòbil
@@ -337,7 +340,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v2.3';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v2.4';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -539,11 +542,21 @@ function fitxersQueQuadren(p, S, ignora){   /* fitxers del projecte p que passen
   if(ignora!=='d' && S.d) F=F.filter(f=>fx(f.cami).destacat || pj(p).destacat);
   return F;
 }
+/* v2.4: projecte SENSE cap fitxer per veure que, per la resta de la tria, hi quadra (surt a la llista igualment) */
+function projecteBuit(p, S, ignora){
+  if(CFG.pres || fitxersDe(p).length) return false;
+  if(ignora!=='t' && S.t) return false; if(ignora!=='d' && S.d) return false;
+  if(ignora!=='g' && S.g && p.grup!==S.g) return false;
+  if(ignora!=='s' && S.s && !sistemesDe(p).includes(S.s)) return false;
+  if(ignora!=='a' && S.a && anyDe(p)!==S.a) return false;
+  if(S.q){ const txP=(nomVisible(p)+' '+(p.meta.client||'')+' '+sistemesDe(p).join(' ')+' '+(p.meta.ubicacio||'')+' '+(pj(p).nota||'')).toLowerCase(); if(!txP.includes(S.q)) return false; }
+  return true;
+}
 function omplirFiltres(){
   const S=seleccio(), NOMT={video:'🎬 Vídeos','3d':'🧊 Models 3D (es giren amb el dit)',imatge:'🖼 Imatges',doc:'📄 PDF',cad:'📐 DWG / DXF'};
-  const compta=(ignora, clauDe)=>{ const C={}; let tot=0; INV.forEach(p=>{ const F=fitxersQueQuadren(p,S,ignora); if(!F.length) return; tot+=F.length; const ks=clauDe(p,F); ks.forEach(k=>{ if(!k) return; C[k]=(C[k]||0)+(ignora==='t'?F.filter(f=>f.tipus===k).length:F.length); }); }); C._tot=tot; return C; };
+  const compta=(ignora, clauDe)=>{ const C={}; let tot=0; INV.forEach(p=>{ const F=fitxersQueQuadren(p,S,ignora); if(!F.length){ if(ignora!=='t' && projecteBuit(p,S,ignora)) clauDe(p,F).forEach(k=>{ if(k) C[k]=C[k]||0; }); return; } tot+=F.length; const ks=clauDe(p,F); ks.forEach(k=>{ if(!k) return; C[k]=(C[k]||0)+(ignora==='t'?F.filter(f=>f.tipus===k).length:F.length); }); }); C._tot=tot; return C; };
   const omple=(sel, C, nomTot, text, ordre)=>{ const v=sel.value, tot=C._tot||0; delete C._tot; const ks=Object.keys(C).sort(ordre);
-    sel.innerHTML='<option value="">'+esc(nomTot)+(tot?' ('+tot+')':'')+'</option>'+ks.map(k=>'<option value="'+esc(k)+'">'+esc(text(k))+' ('+C[k]+')</option>').join('');
+    sel.innerHTML='<option value="">'+esc(nomTot)+(tot?' ('+tot+')':'')+'</option>'+ks.map(k=>'<option value="'+esc(k)+'">'+esc(text(k))+(C[k]?' ('+C[k]+')':'')+'</option>').join('');
     sel.value=ks.includes(v)?v:''; if(sel.value!==v) sel.dataset.reset='1'; };
   const tv=$('fTipus').value;
   omple($('fTipus'), compta('t',(p,F)=>[...new Set(F.map(f=>f.tipus))]), 'Tot', k=>NOMT[k]||k, (a,b)=>['video','3d','imatge','doc','cad'].indexOf(a)-['video','3d','imatge','doc','cad'].indexOf(b));
@@ -605,13 +618,13 @@ function pinta(){
   const S=seleccio(), T=$('targetes'); T.innerHTML='';
   document.querySelector('#pProjectes .guia').classList.toggle('ft', S.t==='fitxes'); const lq=$('qCerca').closest('label').querySelector('span'); if(!lq.dataset.t0) lq.dataset.t0=lq.textContent; lq.textContent = S.t==='fitxes' ? 'Paraula (codi: 3N, PVT, TechBook…)' : lq.dataset.t0;
   if(S.t==='fitxes') return pintaFitxes();   /* v2.1 */
-  const L=INV.map(p=>({ p, F:fitxersQueQuadren(p,S) })).filter(x=>x.F.length);
+  const L=INV.map(p=>({ p, F:fitxersQueQuadren(p,S) })).filter(x=>x.F.length || projecteBuit(x.p,S));   /* v2.4 */
   L.sort((x,y)=>{ const a=x.p, b=y.p; if(S.ord==='nom') return nomVisible(a).localeCompare(nomVisible(b),'ca'); if(S.ord==='mod') return (b.mod||0)-(a.mod||0); const dx=pj(a).destacat?1:0, dy=pj(b).destacat?1:0; if(dx!==dy) return dy-dx; const ax=anyDe(a), ay=anyDe(b); if(ax!==ay) return ay.localeCompare(ax); return (b.mod||0)-(a.mod||0); });
   const nF=L.reduce((a,x)=>a+x.F.length,0), nP=L.length;
   /* resum de la tria, en una línia */
   const NOMT={video:'vídeos','3d':'models 3D',imatge:'imatges',doc:'PDF',cad:'DWG / DXF'}; const parts=[S.t?NOMT[S.t]:'fitxers', S.s||'', S.g?GRUPS[S.g]||S.g:'', S.a||'', S.q?'«'+S.q+'»':'', S.d?'★':''].filter(Boolean);
-  $('estat').innerHTML=nF?('<b>'+nF+' '+parts[0]+'</b>'+(parts.length>1?' · '+esc(parts.slice(1).join(' · ')):'')+' · a <b>'+nP+'</b> projecte'+(nP>1?'s':'')):'';
-  if(!nF){ T.innerHTML='<div class="buit">'+(INV.length?'Res amb aquesta tria. Prova amb menys condicions.':'Encara no s\'ha llegit cap projecte. Prem ↻.')+'</div>'; return; }
+  $('estat').innerHTML=nF?('<b>'+nF+' '+parts[0]+'</b>'+(parts.length>1?' · '+esc(parts.slice(1).join(' · ')):'')+' · a <b>'+nP+'</b> projecte'+(nP>1?'s':'')):(nP?'<b>'+nP+'</b> projecte'+(nP>1?'s':'')+' sense fitxers per veure':'');
+  if(!nP){ T.innerHTML='<div class="buit">'+(INV.length?'Res amb aquesta tria. Prova amb menys condicions.':'Encara no s\'ha llegit cap projecte. Prem ↻.')+'</div>'; return; }
   /* pocs fitxers → tots desplegats; molts → cada projecte plegat (un toc el desplega) */
   const desplegaTot = nF<=24 || nP===1;
   const SEQ_R = L.flatMap(x=>x.F);   /* v2.0: la seqüència del visor = tots els resultats, en aquest ordre */
@@ -622,6 +635,7 @@ function pinta(){
     cap.querySelector('button').onclick=e=>{ e.stopPropagation(); obreFitxa(p); };
     cap.onclick=()=>{ if(OBERTS.has(p.ruta)) OBERTS.delete(p.ruta); else OBERTS.add(p.ruta); pinta(); };
     T.appendChild(cap); if(!obert) return;
+    if(!F.length){ const b=document.createElement('div'); b.className='buit'; b.style.padding='8px 12px'; b.textContent='Sense fitxers per veure al mòbil'+(p.apps.length?' (carpetes: '+p.apps.join(', ')+')':'')+'.'; T.appendChild(b); return; }   /* v2.4 */
     F.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fitxer';
       el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
       el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_R); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_R); T.appendChild(el);
