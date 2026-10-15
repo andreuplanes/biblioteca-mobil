@@ -3,11 +3,28 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v2.4 (13/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v2.6 (15/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v2.6: PLEGAR TOT (Andreu: «alguna tecla per replegar la biblioteca, sobretot pensant en l'app mòbil… per organitzar bé la
+      informació i no perdre'ns»). Sota la cerca, una barra: «⊟ Plegar tot» (plega tots els projectes, o totes les categories i
+      carpetes de la documentació) · «⊞ Desplegar tot» · «▴ Amagar la cerca» (deixa tota la pantalla per als resultats; «▾ Cerca»
+      la torna a obrir). Les CATEGORIES de la documentació (Catàlegs, Certificats, Normativa) també es pleguen amb un toc, com les
+      carpetes de fabricant. Tot es recorda. Amb una paraula escrita, tot surt desplegat (per veure què s'ha trobat).
+      DE MÉS NOU A MÉS ANTIC: dins de cada carpeta, els documents s'ordenen per l'any del nom (2000-2049); sense any, al final.
+      Biblioteca de Projectes: v2.6.
+     v2.5: 📚 DOCUMENTACIÓ TÈCNICA (Andreu: normatives, catàlegs i demés informació tècnica, «amb els mateixos criteris» que la
+      Biblioteca de Projectes). A «Què busques?», l'opció «📚 Documentació tècnica»: dos desplegables, Categoria (les subcarpetes de
+      dades/oficina_tecnica/documentacio/: Normativa, Catàlegs, Certificats i assajos…) i Idioma (Tots, o el que diu el final del nom:
+      …_CA.pdf, …_ES.pdf). La paraula busca al nom, al títol i a la subcarpeta (proveïdor). Es llegeix la carpeta sencera de Dropbox
+      (recursiva) en triar-la; títols, ★, publicable i notes són els de la Biblioteca de Projectes. Els que no són publicables
+      porten «🔒 ús intern» a la llista i al visor. Mateix visor, ‹ › i lliscar, 📤 Enviar, 📄 Obrir amb…, ⬇ Baixar.
+      Sense duplicar: catàlegs (per fabricant) a documentacio/CATALEGS/ i certificats (APPLUS, ENSATEC) a documentacio/CERTIFICATS_I_ASSAJOS/.
+      PER SUBCARPETES: dins de cada categoria, un apartat per fabricant / subcarpeta (DORMA, HENRY GLASS, BRUSTOR…) que es plega amb
+      un toc (es recorda), i amb una categoria triada surt el desplegable «Carpeta» per anar directe a un fabricant.
+      Biblioteca de Projectes: v2.5 (la mateixa pestanya, «📚 Documentació»).
      v2.4: TOTS ELS PROJECTES (Andreu: «vull que surtin tots els projectes», com a l'ordinador). Un projecte sense res per veure
       al mòbil (p. ex. CALCULS PROVISIONALS, que només té el .json del càlcul) també surt a la llista, amb «sense fitxers per veure
       al mòbil». Només si la tria no demana un tipus de fitxer ni destacats; en mode presentació NO (no han de sortir carpetes internes).
@@ -141,6 +158,15 @@ html.dins ::-webkit-scrollbar{ display:none; } html.dins{ scrollbar-width:none; 
 .estat{ padding:6px 12px 10px; color:var(--gris); font-size:13px; }
 /* cerca guiada */
 .guia.ft .noft{ display:none; } .guia:not(.ft) .ftcamps{ display:none; }   /* v2.1 */
+.guia.dc .noft{ display:none; } .guia:not(.dc) .dccamps{ display:none; }   /* v2.5 */
+.grup-sub{ margin:8px 0 4px 8px; padding:6px 10px; background:#f1f3f8; border-radius:10px; font-weight:700; font-size:15px; color:var(--blau); display:flex; justify-content:space-between; }
+.grup-sub .s{ font-weight:400; color:var(--blau2); font-size:13px; }
+/* v2.6 · plegar tot */
+.barra-pleg{ display:flex; gap:8px; padding:0 12px 8px; flex-wrap:wrap; }
+.barra-pleg button{ background:#fff; border:1px solid var(--blau2); color:var(--blau2); border-radius:999px; padding:8px 14px; font-size:15px; }
+.barra-pleg button.cerca{ margin-left:auto; }
+.guia.amagada{ display:none; }
+.grup-proj.cat{ cursor:pointer; }
 .guia{ padding:12px 12px 4px; display:flex; flex-direction:column; gap:10px; }
 .camp{ display:block; } .camp>span{ display:block; font-size:14px; font-weight:600; color:var(--gris); margin:0 0 4px 2px; }
 .gran{ width:100%; font-size:18px; padding:13px 12px; border:1px solid var(--linia); border-radius:12px; background:#fff; color:var(--text); -webkit-appearance:none; appearance:none; }
@@ -294,6 +320,11 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
       <label class="camp"><span>Família</span><select id="ftFam" class="gran"></select></label>
       <label class="camp"><span>Idioma</span><select id="ftId" class="gran"><option value="CA">Català</option><option value="ES">Castellà</option><option value="FR">Francès</option><option value="EN">Anglès</option><option value="PT">Portuguès</option><option value="DE">Alemany</option></select></label>
     </div>
+    <div class="dos dccamps">
+      <label class="camp"><span>Categoria</span><select id="dcCat" class="gran"><option value="">Totes</option></select></label>
+      <label class="camp" id="dcSubL" style="display:none"><span>Carpeta</span><select id="dcSub" class="gran"><option value="">Totes</option></select></label>
+      <label class="camp"><span>Idioma</span><select id="dcId" class="gran"><option value="">Tots</option><option value="CA">Català</option><option value="ES">Castellà</option><option value="FR">Francès</option><option value="EN">Anglès</option><option value="PT">Portuguès</option><option value="DE">Alemany</option></select></label>
+    </div>
     <label class="camp noft"><span>De quin tipus d'aplicació?</span>
       <select id="fSis" class="gran"><option value="">Totes les aplicacions</option></select></label>
     <div class="dos noft">
@@ -308,6 +339,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
   </div>
   <div class="progres" id="progres"><i></i></div>
   <div class="estat" id="estat"></div>
+  <div class="barra-pleg" id="barraPleg"><button id="bPlegaTot">⊟ Plegar tot</button><button id="bDesplegaTot">⊞ Desplegar tot</button><button id="bCercaT" class="cerca">▴ Amagar la cerca</button></div>   <!-- v2.6 -->
   <div class="resultats" id="targetes"></div>
 </section>
 
@@ -340,7 +372,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v2.4';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v2.6';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -560,7 +592,7 @@ function omplirFiltres(){
     sel.value=ks.includes(v)?v:''; if(sel.value!==v) sel.dataset.reset='1'; };
   const tv=$('fTipus').value;
   omple($('fTipus'), compta('t',(p,F)=>[...new Set(F.map(f=>f.tipus))]), 'Tot', k=>NOMT[k]||k, (a,b)=>['video','3d','imatge','doc','cad'].indexOf(a)-['video','3d','imatge','doc','cad'].indexOf(b));
-  $('fTipus').insertAdjacentHTML('beforeend','<option value="fitxes">📘 Fitxes tècniques</option>'); if(tv==='fitxes') $('fTipus').value='fitxes';   /* v2.1 */
+  $('fTipus').insertAdjacentHTML('beforeend','<option value="fitxes">📘 Fitxes tècniques</option><option value="docs">📚 Documentació tècnica</option>'); if(tv==='fitxes' || tv==='docs') $('fTipus').value=tv;   /* v2.1 · v2.5 */
   omple($('fSis'), compta('s',(p,F)=>sistemesDe(p)), 'Totes les aplicacions', k=>k, (a,b)=>a.localeCompare(b,'ca'));
   omple($('fGrup'), compta('g',(p,F)=>[p.grup]), 'Totes', k=>GRUPS[k]||k, (a,b)=>a.localeCompare(b,'ca'));
   omple($('fAny'), compta('a',(p,F)=>[anyDe(p)]), 'Tots', k=>k, (a,b)=>b.localeCompare(a));
@@ -612,12 +644,104 @@ function pintaFitxes(){
       el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_F); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_F); T.appendChild(el);
       if(!gran && f.mida!=null) demanaPrevia(el.querySelector('.mini2'), f, SEQ_F); }); });
 }
+/* ═════════════ v2.5 · DOCUMENTACIÓ TÈCNICA (carpeta dades/oficina_tecnica/documentacio/; NOMÉS LECTURA) ═════════════
+   Les mateixes regles que la Biblioteca de Projectes v2.5: cada subcarpeta de primer nivell és una categoria; l'idioma, del final del nom. */
+const DC_DIR='dades/oficina_tecnica/documentacio';
+const DC_CATS={ NORMATIVA:'⚖ Normativa', CATALEGS:'📗 Catàlegs', CERTIFICATS_I_ASSAJOS:'🏅 Certificats i assajos', MANUALS:'🛠 Manuals i instruccions',
+  PROVEIDORS:'🏭 Documentació de proveïdors', ESTUDIS:'📐 Estudis i criteris', ALTRES:'📎 Altres' };
+const DC_ORDRE=['CATALEGS','CERTIFICATS_I_ASSAJOS','NORMATIVA','MANUALS','PROVEIDORS','ESTUDIS','ALTRES']   /* ordre de l'Andreu (15/10): catàlegs, certificats, normativa */, DC_IDN={ CAT:'CA', ESP:'ES', ENG:'EN', POR:'PT' };
+let DC=null, DC_CARR=null, DC_PROVAT=false; let DC_PLEG=new Set(); try{ DC_PLEG=new Set(JSON.parse(localStorage.getItem('bm.dcPlegats')||'[]')); }catch(e){}
+let DC_VISIBLES=[];   /* v2.6: categories i carpetes que hi ha a la pantalla */
+function desaPleg(){ try{ localStorage.setItem('bm.dcPlegats', JSON.stringify([...DC_PLEG])); }catch(e){} }
+const dcTop=f=>(f.sub||'').split('/')[0], dcResta=f=>(f.sub||'').split('/').slice(1).join('/');
+try{ const i=localStorage.getItem('bm.dcId'); if(i!=null) $('dcId').value=i; }catch(e){}
+function dcBase(){ return CFG.arrel.replace(/\/+$/,'')+'/'+DC_DIR; }
+function dcNomCat(c){ if(!c) return '📄 Sense categoria'; return DC_CATS[c.toUpperCase()] || ('📁 '+c.replace(/_/g,' ').toLowerCase().replace(/^./,x=>x.toUpperCase())); }
+function dcIdioma(nom){ const m=/[_\-\s(](CA|CAT|ES|ESP|FR|EN|ENG|PT|POR|DE)\)?$/i.exec(String(nom).replace(/\.[^.]+$/,'')); if(!m) return ''; const k=m[1].toUpperCase(); return DC_IDN[k]||k; }
+function dcFora(n){ return /^(\.|~\$)/.test(n) || /^llegeix[-_]?me/i.test(n) || /\.(bak|tmp|ini|md|txt|json)$/i.test(n) || /^thumbs\.db$/i.test(n) || FORA.has(n); }
+const DC_FONTS=[];   /* 15/10/2026: catàlegs i certificats ja són dins de documentacio/ (CATALEGS, CERTIFICATS_I_ASSAJOS); es deixa el mecanisme per si cal llegir una carpeta externa */
+/* 15/10/2026: de més nou a més antic segons l'any del nom (2000-2049; evita confondre-ho amb EN 1991, 12150...). Sense any: al final, per nom */
+function dcAny(s){ let m, r=0; const re=/(?<!\d)(20[0-4]\d)(?!\d)/g; while((m=re.exec(String(s||'')))) r=Math.max(r,+m[1]); return r; }
+function dcCmpNou(a,b){ return dcAny(b)-dcAny(a) || String(a||'').localeCompare(String(b||''),'ca'); }
+function dcOrdreF(x,y){ const A=(x.sub||'').split('/'), B=(y.sub||'').split('/'); if(A[0]!==B[0]) return A[0].localeCompare(B[0],'ca');
+  for(let i=1;i<Math.max(A.length,B.length);i++){ const a=A[i], b=B[i]; if(a===b) continue; if(a==null) return -1; if(b==null) return 1; return dcCmpNou(a,b); }
+  return dcCmpNou(x.nom,y.nom); }
+function carregaDocs(){ if(DC_CARR) return DC_CARR;
+  DC_CARR=(async()=>{ const arr=CFG.arrel.replace(/\/+$/,''), cats={}, L=[]; let hi=false;
+    /* font = { base (camí absolut), cat (fixa) o null (la 1a subcarpeta és la categoria) } */
+    const FONTS=[{ base:dcBase(), cat:null }].concat(DC_FONTS.map(F=>({ base:arr+'/'+F.dir, cat:F.cat })));
+    const afegeix=(F, rel, mida, mod)=>{ const parts=rel.split('/'); if(parts.some(dcFora)) return; const nom=parts.pop();
+      if(F.cat==null && parts.length && DC_FONTS.some(x=>x.cat===parts[0].toUpperCase())) return;
+      const cat=F.cat!=null ? F.cat : (parts.length?parts.shift():''), sub=parts.join('/');
+      const f={ cami:F.base+'/'+rel, nom, tipus:tipusDe(nom), cat, sub, idioma:dcIdioma(nom), mida:mida||null, mod:mod||null, dc:true,
+        on:dcNomCat(cat).replace(/^\S+\s/,'')+(sub?' · '+sub:'') }; L.push(f); (cats[cat]=cats[cat]||[]).push(f); };
+    for(const F of FONTS){ if(F.cat) cats[F.cat]=cats[F.cat]||[];
+      if(LOCAL){ const walk=async(rel, prof)=>{ let R; try{ R=await llistaLocal(F.base+(rel?'/'+rel:'')); }catch(e){ return; } hi=true;
+          R.fits.forEach(n=>afegeix(F, (rel?rel+'/':'')+n)); if(!rel && F.cat==null) R.dirs.filter(d=>!dcFora(d) && !DC_FONTS.some(x=>x.cat===d.toUpperCase())).forEach(d=>{ cats[d]=cats[d]||[]; });
+          if(prof<4) for(const d of R.dirs){ if(!dcFora(d)) await walk((rel?rel+'/':'')+d, prof+1); } };
+        await walk('', 0); }
+      else { let j; try{ j=await rpc('files/list_folder',{ path:F.base, recursive:true, limit:2000 }); }catch(e){ j=null; }
+        if(j){ hi=true; const bl=F.base.toLowerCase()+'/';
+          for(;;){ j.entries.forEach(e=>{ const pd=e.path_display||'', rel=pd.toLowerCase().startsWith(bl) ? pd.slice(bl.length) : ''; if(!rel) return;
+              if(e['.tag']==='file') afegeix(F, rel, e.size, e.server_modified?Date.parse(e.server_modified):null);
+              else if(F.cat==null && e['.tag']==='folder' && !rel.includes('/') && !dcFora(rel) && !DC_FONTS.some(x=>x.cat===rel.toUpperCase())) cats[rel]=cats[rel]||[]; });
+            if(!j.has_more) break; j=await rpc('files/list_folder/continue',{ cursor:j.cursor }); } } } }
+    DC_PROVAT=true; if(!hi){ DC=null; return null; }
+    Object.values(cats).forEach(a=>a.sort(dcOrdreF));
+    DC={ cats, L }; return DC; })().catch(()=>{ DC_PROVAT=true; DC=null; return null; }).finally(()=>{ DC_CARR=null; });
+  return DC_CARR; }
+function pintaDocs(){
+  const T=$('targetes'); T.innerHTML='';
+  if(!DC){ T.innerHTML='<div class="buit">'+(DC_CARR || !DC_PROVAT ? '⏳ Llegint la documentació tècnica…' : 'No s\'ha pogut llegir la carpeta de documentació ('+esc(DC_DIR)+').')+'</div>'; $('estat').innerHTML='';
+    if(!DC_CARR && !DC_PROVAT) carregaDocs().then(()=>{ if($('fTipus').value==='docs') pinta(); }); return; }
+  const id=$('dcId').value||''; try{ localStorage.setItem('bm.dcId', id); }catch(e){}
+  const cats=Object.keys(DC.cats).sort((a,b)=>{ const ia=DC_ORDRE.indexOf(a.toUpperCase()), ib=DC_ORDRE.indexOf(b.toUpperCase()); return (ia<0?99:ia)-(ib<0?99:ib) || a.localeCompare(b,'ca'); });
+  const cv=$('dcCat').value; $('dcCat').innerHTML='<option value="">Totes ('+DC.L.length+')</option>'+cats.map(c=>'<option value="'+esc(c)+'">'+esc(dcNomCat(c).replace(/^\S+\s/,''))+' ('+DC.cats[c].length+')</option>').join('');
+  const cat=cats.includes(cv) ? cv : ''; $('dcCat').value=cat;
+  const subs=cat ? [...new Set(DC.cats[cat].map(dcTop).filter(Boolean))].sort((a,b)=>(a.startsWith('_')?1:0)-(b.startsWith('_')?1:0) || a.localeCompare(b,'ca')) : [], sv=$('dcSub').value;
+  $('dcSub').innerHTML='<option value="">Totes</option>'+subs.map(x=>'<option value="'+esc(x)+'">'+esc(x)+' ('+DC.cats[cat].filter(f=>dcTop(f)===x).length+')</option>').join('');
+  const sub=subs.includes(sv) ? sv : ''; $('dcSub').value=sub; $('dcSubL').style.display=subs.length?'':'none';
+  const q=$('qCerca').value.trim().toLowerCase(), nomId=id ? (FT_NOMID[id]||id) : '', G=[];
+  cats.filter(c=>!cat || c===cat).forEach(c=>{ const L=DC.cats[c].filter(f=>{ const o=fx(f.cami); if(id && f.idioma && f.idioma!==id) return false;
+      if($('fDest').checked && !o.destacat) return false;
+      if(sub && c===cat && dcTop(f)!==sub) return false;
+      return !q || (f.nom+' '+(o.titol||'')+' '+(o.nota||'')+' '+f.cat+' '+(f.sub||'')).toLowerCase().includes(q); }); if(L.length) G.push({ c, nom:dcNomCat(c)+(sub && c===cat?' · '+sub:''), L }); });
+  const SEQ_D=G.flatMap(g=>g.L), n=SEQ_D.length;
+  $('estat').innerHTML=n ? '<b>'+n+' documents</b>'+(nomId?' · en '+nomId:'') : '';
+  if(!n){ T.innerHTML='<div class="buit">'+(DC.L.length ? 'Cap document amb aquesta tria.' : 'La carpeta de documentació encara és buida.')+'</div>'; return; }
+  const fila=f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fitxer'; const gran=f.tipus==='doc' && f.mida>PDF_MAX_PREVIA;
+      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom.replace(/\.[^.]+$/,''))+'</div><div class="d">'+esc([f.idioma, dcResta(f), ext(f.nom).toUpperCase(), f.mida?midaTx(f.mida):'', o.publicable?'':'🔒 ús intern'].filter(Boolean).join(' · '))+'</div><div class="acc"><button class="veure">▶ Veure</button><button class="sec envia">📤 Enviar</button></div></div>';
+      el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_D); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_D); T.appendChild(el);
+      if(!gran) demanaPrevia(el.querySelector('.mini2'), f, SEQ_D); };
+  DC_VISIBLES=G.map(g=>({ c:g.c, tops:[...new Set(g.L.map(f=>(sub && g.c===cat) ? '' : dcTop(f)).filter(Boolean))] }));   /* v2.6: per a «Plegar tot» */
+  G.forEach(g=>{ const kc='cat:'+g.c, plc=DC_PLEG.has(kc) && !q, cap=document.createElement('div'); cap.className='grup-proj cat'+(plc?'':' obert'); cap.innerHTML='<div class="n">'+(plc?'▸':'▾')+' '+esc(g.nom)+'</div><div class="s">'+g.L.length+'</div>'; T.appendChild(cap);
+    cap.onclick=()=>{ if(DC_PLEG.has(kc)) DC_PLEG.delete(kc); else DC_PLEG.add(kc); desaPleg(); pinta(); };   /* v2.6: la categoria també es plega */
+    if(plc) return;
+    /* v2.5 · per subcarpetes (fabricant): els fitxers solts primer; cada apartat es plega amb un toc */
+    const M=new Map(); g.L.forEach(f=>{ const t=(sub && g.c===cat) ? '' : dcTop(f); if(!M.has(t)) M.set(t, []); M.get(t).push(f); });
+    [...M.keys()].sort((a,b)=>(a?1:0)-(b?1:0) || (a.startsWith('_')?1:0)-(b.startsWith('_')?1:0) || a.localeCompare(b,'ca')).forEach(t=>{ const F=M.get(t); if(!t){ F.forEach(fila); return; }
+      const k=g.c+'/'+t, pleg=DC_PLEG.has(k) && !q, sc=document.createElement('div'); sc.className='grup-sub';
+      sc.innerHTML='<span>'+(pleg?'▸':'▾')+' 📁 '+esc(t)+'</span><span class="s">'+F.length+'</span>'; T.appendChild(sc);
+      sc.onclick=()=>{ if(DC_PLEG.has(k)) DC_PLEG.delete(k); else DC_PLEG.add(k); desaPleg(); pinta(); };
+      if(!pleg) F.forEach(fila); }); });
+}
 const OBERTS=new Set();   /* projectes desplegats a la llista de resultats */
+let PROJ_PLEG=false, PROJ_VISIBLES=[];   /* v2.6: «Plegar tot» mana sobre el desplegat automàtic (pocs fitxers) */
+try{ PROJ_PLEG=localStorage.getItem('bm.projPlegats')==='1'; }catch(e){}
+function plegaTot(plega){ const t=$('fTipus').value;
+  if(t==='docs'){ if(plega) DC_VISIBLES.forEach(g=>{ DC_PLEG.add('cat:'+g.c); g.tops.forEach(x=>DC_PLEG.add(g.c+'/'+x)); }); else DC_PLEG.clear(); desaPleg(); }
+  else { PROJ_PLEG=plega; OBERTS.clear(); if(!plega) PROJ_VISIBLES.forEach(r=>OBERTS.add(r)); try{ localStorage.setItem('bm.projPlegats', plega?'1':''); }catch(e){} }
+  pinta(); }
+function cercaVisible(v){ document.querySelector('#pProjectes .guia').classList.toggle('amagada', !v); $('bCercaT').textContent = v ? '▴ Amagar la cerca' : '▾ Cerca';
+  try{ localStorage.setItem('bm.cercaAmagada', v?'':'1'); }catch(e){} }
 function pinta(){
   omplirFiltres();
   const S=seleccio(), T=$('targetes'); T.innerHTML='';
   document.querySelector('#pProjectes .guia').classList.toggle('ft', S.t==='fitxes'); const lq=$('qCerca').closest('label').querySelector('span'); if(!lq.dataset.t0) lq.dataset.t0=lq.textContent; lq.textContent = S.t==='fitxes' ? 'Paraula (codi: 3N, PVT, TechBook…)' : lq.dataset.t0;
+  document.querySelector('#pProjectes .guia').classList.toggle('dc', S.t==='docs'); if(S.t==='docs') lq.textContent='Paraula (trempat, 12150, Dorma, assaig…)';   /* v2.5 */
+  $('barraPleg').style.display = S.t==='fitxes' ? 'none' : '';   /* v2.6 */
   if(S.t==='fitxes') return pintaFitxes();   /* v2.1 */
+  if(S.t==='docs') return pintaDocs();   /* v2.5 */
   const L=INV.map(p=>({ p, F:fitxersQueQuadren(p,S) })).filter(x=>x.F.length || projecteBuit(x.p,S));   /* v2.4 */
   L.sort((x,y)=>{ const a=x.p, b=y.p; if(S.ord==='nom') return nomVisible(a).localeCompare(nomVisible(b),'ca'); if(S.ord==='mod') return (b.mod||0)-(a.mod||0); const dx=pj(a).destacat?1:0, dy=pj(b).destacat?1:0; if(dx!==dy) return dy-dx; const ax=anyDe(a), ay=anyDe(b); if(ax!==ay) return ay.localeCompare(ax); return (b.mod||0)-(a.mod||0); });
   const nF=L.reduce((a,x)=>a+x.F.length,0), nP=L.length;
@@ -626,7 +750,8 @@ function pinta(){
   $('estat').innerHTML=nF?('<b>'+nF+' '+parts[0]+'</b>'+(parts.length>1?' · '+esc(parts.slice(1).join(' · ')):'')+' · a <b>'+nP+'</b> projecte'+(nP>1?'s':'')):(nP?'<b>'+nP+'</b> projecte'+(nP>1?'s':'')+' sense fitxers per veure':'');
   if(!nP){ T.innerHTML='<div class="buit">'+(INV.length?'Res amb aquesta tria. Prova amb menys condicions.':'Encara no s\'ha llegit cap projecte. Prem ↻.')+'</div>'; return; }
   /* pocs fitxers → tots desplegats; molts → cada projecte plegat (un toc el desplega) */
-  const desplegaTot = nF<=24 || nP===1;
+  const desplegaTot = !PROJ_PLEG && (nF<=24 || nP===1);   /* v2.6 */
+  PROJ_VISIBLES=L.map(x=>x.p.ruta);
   const SEQ_R = L.flatMap(x=>x.F);   /* v2.0: la seqüència del visor = tots els resultats, en aquest ordre */
   L.forEach(({p,F})=>{ const obert=desplegaTot || OBERTS.has(p.ruta);
     const nV=F.filter(f=>f.tipus==='video').length, n3=F.filter(f=>f.tipus==='3d').length, nI=F.filter(f=>f.tipus==='imatge').length, nD=F.filter(f=>f.tipus==='doc').length, nC=F.filter(f=>f.tipus==='cad').length;
@@ -841,7 +966,7 @@ function preparaSeguent(){ const g=SEQ[SEQI+1]; if(!g) return;
 async function obreVisor(f, enviar, seq){
   netejaCos(); if(Array.isArray(seq)){ SEQ=seq; } else if(!SEQ.includes(f)) SEQ=[f]; SEQI=SEQ.indexOf(f); if(SEQI<0){ SEQ=[f]; SEQI=0; } pintaNav();
   if(SEQI+1<SEQ.length) setTimeout(()=>{ if(VF===f) preparaSeguent(); }, 600);
-  VF=f; VBLOB=null; const o=fx(f.cami); $('vTitol').textContent=(o.titol||f.nom)+(OBERT?'':''); $('vNota').textContent=[o.nota, f.on, f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · ');
+  VF=f; VBLOB=null; const o=fx(f.cami); $('vTitol').textContent=(o.titol||f.nom)+(OBERT?'':''); $('vNota').textContent=[(f.dc && !o.publicable)?'🔒 ús intern (no publicable)':'', o.nota, f.on, f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · ');   /* v2.5 */
   const C=$('vCos'); C.innerHTML='<div class="cad" style="color:#999">⏳</div>'; $('visor').classList.add('obert');
   $('vEnvia').disabled=false; $('vEnvia').textContent='📤 Enviar'; $('vObre').style.display='none'; $('vObre').disabled=false; $('vObre').textContent='📄 Obrir amb…'; $('vBaixa').removeAttribute('href'); $('vDropbox').style.display=o.enllac?'':'none'; if(o.enllac) $('vDropbox').href=o.enllac;
   try{ const u=await enllacTemporal(f.cami); if(VF!==f) return; $('vBaixa').href=u; $('vBaixa').setAttribute('download', f.nom);
@@ -920,12 +1045,16 @@ $('bEntra').onclick=entra;
 $('bConfig').onclick=()=>{ $('cVersio').textContent=APP_VERSION; $('infoConfig').innerHTML=LOCAL?'Mode PANELL (prova a l\'ordinador): llegeix el disc a través del servidor del PANELL. Al mòbil llegirà el Dropbox.'
     :'Compte: <b>'+esc(localStorage.getItem('bm.compte')||'—')+'</b><br>Pàgina: '+esc(REDIRECT)+' (ha de ser la Redirect URI de l\'app de Dropbox)'; mostra('pConfig'); };
 $('bEnrere').onclick=()=>{ if($('pFitxa').classList.contains('activa')||$('pConfig').classList.contains('activa')){ $('titol').textContent='Biblioteca de Projectes'; mostra(LOCAL||TOKEN.refresh||TOKEN.access?'pProjectes':'pEntrada'); } };
+/* v2.6 · plegar tot / amagar la cerca */
+$('bPlegaTot').onclick=()=>plegaTot(true); $('bDesplegaTot').onclick=()=>plegaTot(false);
+$('bCercaT').onclick=()=>cercaVisible(document.querySelector('#pProjectes .guia').classList.contains('amagada'));
+try{ if(localStorage.getItem('bm.cercaAmagada')==='1') cercaVisible(false); }catch(e){}
 $('bDesaConfig').onclick=()=>{ CFG.clau=$('cClau').value.trim(); CFG.arrel=$('cArrel').value.trim()||'/PANELL'; if(!CFG.arrel.startsWith('/')) CFG.arrel='/'+CFG.arrel; CFG.pres=$('cPres').checked; CFG.previes=$('cPrev').checked; localStorage.setItem('bm.previes',CFG.previes?'1':'0');
   localStorage.setItem('bm.clau',CFG.clau); localStorage.setItem('bm.arrel',CFG.arrel); localStorage.setItem('bm.pres',CFG.pres?'1':'0'); toast('Desat.'); $('bEnrere').onclick(); pinta(); };
 $('bSurt').onclick=()=>{ localStorage.removeItem('bm.compte'); surt(); toast('Accés esborrat d\'aquest mòbil.'); };
 $('bBuidaCau').onclick=async()=>{ localStorage.removeItem('bm.cau'); CURSOR=null; ENTRADES={}; INV=[]; mostra('pProjectes'); try{ await llegeixTot(); }catch(e){ toast('⚠ '+e.message,8000); } };
 $('bActualitza').onclick=async()=>{ try{ await llegeixDB(); await actualitza(); toast('Al dia.'); }catch(e){ toast('⚠ '+e.message,8000); } };
-['qCerca','fGrup','fSis','fAny','fTipus','fDest','fOrdre','ftFam','ftId'].forEach(id=>{ $(id).addEventListener('input',pinta); $(id).addEventListener('change',pinta); });
+['qCerca','fGrup','fSis','fAny','fTipus','fDest','fOrdre','ftFam','ftId','dcCat','dcSub','dcId'].forEach(id=>{ $(id).addEventListener('input',pinta); $(id).addEventListener('change',pinta); });
 $('vTanca').onclick=tancaVisor;
 /* v2.0: ‹ › · lliscar a dreta / esquerra (no al 3D ni al DXF; al PDF només sense ampliar) · ← → al teclat */
 $('vAnt').onclick=()=>ves(-1); $('vSeg').onclick=()=>ves(1);
