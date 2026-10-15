@@ -3,11 +3,19 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v2.6 (15/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v2.9 (15/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v2.9: ORDRE DE L'ARBRE (Andreu: «DORMA: documentació, fitxes tècniques, CAD»): 📄 DOCUMENTACIO primer, carpetes per nom, les de CAD al
+      final i les «_…» del tot al final. Biblioteca de Projectes: v2.9.
+     v2.8: ARBRE DE CARPETES (Andreu: «en obrir DORMA han de sortir les subcarpetes… i en obrir una subcarpeta que es desplegui el contingut»).
+      Cada nivell: primer les subcarpetes, PLEGADES (📁 nom · nombre de fitxers); els solts d'un nivell que també té subcarpetes, a «📄 DOCUMENTACIO»,
+      al final. Un toc obre / tanca (bm.dcOberts). ⊞ Desplegar tot obre tot l'arbre. Biblioteca de Projectes: v2.8.
+     v2.7: SUBCARPETES DINS DEL FABRICANT (Andreu: «no veig les subcarpetes de DORMA»). Dins de cada fabricant, un apartat plegable per
+      subcarpeta («📂 FITXES TECNIQUES HSW-FSW › HSW › CAD»), els solts primer; «Plegar tot» també els plega. Al PANELL es llegeix fins a 8
+      nivells (abans 4). Biblioteca de Projectes: v2.7.
      v2.6: PLEGAR TOT (Andreu: «alguna tecla per replegar la biblioteca, sobretot pensant en l'app mòbil… per organitzar bé la
       informació i no perdre'ns»). Sota la cerca, una barra: «⊟ Plegar tot» (plega tots els projectes, o totes les categories i
       carpetes de la documentació) · «⊞ Desplegar tot» · «▴ Amagar la cerca» (deixa tota la pantalla per als resultats; «▾ Cerca»
@@ -372,7 +380,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v2.6';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v2.9';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -652,6 +660,8 @@ const DC_CATS={ NORMATIVA:'⚖ Normativa', CATALEGS:'📗 Catàlegs', CERTIFICAT
 const DC_ORDRE=['CATALEGS','CERTIFICATS_I_ASSAJOS','NORMATIVA','MANUALS','PROVEIDORS','ESTUDIS','ALTRES']   /* ordre de l'Andreu (15/10): catàlegs, certificats, normativa */, DC_IDN={ CAT:'CA', ESP:'ES', ENG:'EN', POR:'PT' };
 let DC=null, DC_CARR=null, DC_PROVAT=false; let DC_PLEG=new Set(); try{ DC_PLEG=new Set(JSON.parse(localStorage.getItem('bm.dcPlegats')||'[]')); }catch(e){}
 let DC_VISIBLES=[];   /* v2.6: categories i carpetes que hi ha a la pantalla */
+let DC_OBERT=new Set(); try{ DC_OBERT=new Set(JSON.parse(localStorage.getItem('bm.dcOberts')||'[]')); }catch(e){}   /* v2.8: carpetes obertes (per defecte, plegades) */
+function desaObert(){ try{ localStorage.setItem('bm.dcOberts', JSON.stringify([...DC_OBERT])); }catch(e){} }
 function desaPleg(){ try{ localStorage.setItem('bm.dcPlegats', JSON.stringify([...DC_PLEG])); }catch(e){} }
 const dcTop=f=>(f.sub||'').split('/')[0], dcResta=f=>(f.sub||'').split('/').slice(1).join('/');
 try{ const i=localStorage.getItem('bm.dcId'); if(i!=null) $('dcId').value=i; }catch(e){}
@@ -666,6 +676,19 @@ function dcCmpNou(a,b){ return dcAny(b)-dcAny(a) || String(a||'').localeCompare(
 function dcOrdreF(x,y){ const A=(x.sub||'').split('/'), B=(y.sub||'').split('/'); if(A[0]!==B[0]) return A[0].localeCompare(B[0],'ca');
   for(let i=1;i<Math.max(A.length,B.length);i++){ const a=A[i], b=B[i]; if(a===b) continue; if(a==null) return -1; if(b==null) return 1; return dcCmpNou(a,b); }
   return dcCmpNou(x.nom,y.nom); }
+/* v2.8 · ARBRE DE CARPETES (Andreu: «en obrir DORMA han de sortir les subcarpetes… i en obrir una subcarpeta que es desplegui el contingut»).
+   Cada nivell: primer les subcarpetes (plegades, amb el nombre de fitxers de dins), i els fitxers solts d'aquell nivell, si n'hi ha
+   i també hi ha subcarpetes, dins d'un apartat «DOCUMENTACIO» al final. Un nivell sense subcarpetes ensenya els fitxers directament. */
+function dcArbre(L, c){ const R={ nom:c, k:c, d:new Map(), f:[], n:0 };
+  L.forEach(f=>{ let nd=R; nd.n++; (f.sub ? f.sub.split('/') : []).forEach(p=>{ if(!nd.d.has(p)) nd.d.set(p, { nom:p, k:nd.k+'/'+p, d:new Map(), f:[], n:0 }); nd=nd.d.get(p); nd.n++; }); nd.f.push(f); });
+  return R; }
+/* v2.9 · ordre de cada nivell (Andreu: «DORMA, per ordre: documentació, fitxes tècniques, CAD»): 📄 DOCUMENTACIO primer, després les
+   carpetes per nom, les de CAD al final i les que comencen per «_» (_VARIS) del tot al final */
+function dcPes(nom){ return nom.startsWith('_') ? 3 : /^(CAD|DWG|DXF)\b|^CAD[_ -]/i.test(nom) ? 2 : 1; }
+function dcFills(nd){ const D=[...nd.d.values()].sort((a,b)=>dcPes(a.nom)-dcPes(b.nom) || a.nom.localeCompare(b.nom,'ca'));
+  if(D.length && nd.f.length) D.unshift({ nom:'DOCUMENTACIO', k:nd.k+'/#doc', d:new Map(), f:nd.f, n:nd.f.length, doc:true });
+  return D; }
+function dcClaus(nd, out){ dcFills(nd).forEach(x=>{ out.push(x.k); dcClaus(x, out); }); return out; }
 function carregaDocs(){ if(DC_CARR) return DC_CARR;
   DC_CARR=(async()=>{ const arr=CFG.arrel.replace(/\/+$/,''), cats={}, L=[]; let hi=false;
     /* font = { base (camí absolut), cat (fixa) o null (la 1a subcarpeta és la categoria) } */
@@ -678,7 +701,7 @@ function carregaDocs(){ if(DC_CARR) return DC_CARR;
     for(const F of FONTS){ if(F.cat) cats[F.cat]=cats[F.cat]||[];
       if(LOCAL){ const walk=async(rel, prof)=>{ let R; try{ R=await llistaLocal(F.base+(rel?'/'+rel:'')); }catch(e){ return; } hi=true;
           R.fits.forEach(n=>afegeix(F, (rel?rel+'/':'')+n)); if(!rel && F.cat==null) R.dirs.filter(d=>!dcFora(d) && !DC_FONTS.some(x=>x.cat===d.toUpperCase())).forEach(d=>{ cats[d]=cats[d]||[]; });
-          if(prof<4) for(const d of R.dirs){ if(!dcFora(d)) await walk((rel?rel+'/':'')+d, prof+1); } };
+          if(prof<8) for(const d of R.dirs){ if(!dcFora(d)) await walk((rel?rel+'/':'')+d, prof+1); } };   /* v2.7: abans 4 */
         await walk('', 0); }
       else { let j; try{ j=await rpc('files/list_folder',{ path:F.base, recursive:true, limit:2000 }); }catch(e){ j=null; }
         if(j){ hi=true; const bl=F.base.toLowerCase()+'/';
@@ -713,23 +736,26 @@ function pintaDocs(){
       el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom.replace(/\.[^.]+$/,''))+'</div><div class="d">'+esc([f.idioma, dcResta(f), ext(f.nom).toUpperCase(), f.mida?midaTx(f.mida):'', o.publicable?'':'🔒 ús intern'].filter(Boolean).join(' · '))+'</div><div class="acc"><button class="veure">▶ Veure</button><button class="sec envia">📤 Enviar</button></div></div>';
       el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_D); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_D); T.appendChild(el);
       if(!gran) demanaPrevia(el.querySelector('.mini2'), f, SEQ_D); };
-  DC_VISIBLES=G.map(g=>({ c:g.c, tops:[...new Set(g.L.map(f=>(sub && g.c===cat) ? '' : dcTop(f)).filter(Boolean))] }));   /* v2.6: per a «Plegar tot» */
+  DC_VISIBLES=G.map(g=>({ c:g.c, claus:dcClaus(dcArbre(g.L, g.c), []) }));   /* v2.8: per a «Plegar / Desplegar tot» */
   G.forEach(g=>{ const kc='cat:'+g.c, plc=DC_PLEG.has(kc) && !q, cap=document.createElement('div'); cap.className='grup-proj cat'+(plc?'':' obert'); cap.innerHTML='<div class="n">'+(plc?'▸':'▾')+' '+esc(g.nom)+'</div><div class="s">'+g.L.length+'</div>'; T.appendChild(cap);
     cap.onclick=()=>{ if(DC_PLEG.has(kc)) DC_PLEG.delete(kc); else DC_PLEG.add(kc); desaPleg(); pinta(); };   /* v2.6: la categoria també es plega */
     if(plc) return;
-    /* v2.5 · per subcarpetes (fabricant): els fitxers solts primer; cada apartat es plega amb un toc */
-    const M=new Map(); g.L.forEach(f=>{ const t=(sub && g.c===cat) ? '' : dcTop(f); if(!M.has(t)) M.set(t, []); M.get(t).push(f); });
-    [...M.keys()].sort((a,b)=>(a?1:0)-(b?1:0) || (a.startsWith('_')?1:0)-(b.startsWith('_')?1:0) || a.localeCompare(b,'ca')).forEach(t=>{ const F=M.get(t); if(!t){ F.forEach(fila); return; }
-      const k=g.c+'/'+t, pleg=DC_PLEG.has(k) && !q, sc=document.createElement('div'); sc.className='grup-sub';
-      sc.innerHTML='<span>'+(pleg?'▸':'▾')+' 📁 '+esc(t)+'</span><span class="s">'+F.length+'</span>'; T.appendChild(sc);
-      sc.onclick=()=>{ if(DC_PLEG.has(k)) DC_PLEG.delete(k); else DC_PLEG.add(k); desaPleg(); pinta(); };
-      if(!pleg) F.forEach(fila); }); });
+    /* v2.8 · arbre de carpetes: primer les subcarpetes (plegades); els solts d'un nivell amb subcarpetes, a «DOCUMENTACIO» */
+    const A=dcArbre(g.L, g.c), arrel=(sub && g.c===cat && A.d.get(sub)) || A;
+    const arb=(nd, dep)=>{ const D=dcFills(nd);
+      if(!D.length){ nd.f.forEach(f=>{ fila(f); const el=T.lastElementChild; if(el && dep) el.style.marginLeft=(dep*14)+'px'; }); return; }
+      D.forEach(x=>{ const ob=!!q || DC_OBERT.has(x.k) || (sub && g.c===cat && arrel===A), s2=document.createElement('div'); s2.className='grup-sub';
+        s2.style.marginLeft=(8+dep*14)+'px'; if(dep) s2.style.fontSize='14px';
+        s2.innerHTML='<span>'+(ob?'▾':'▸')+' '+(x.doc?'📄':(ob?'📂':'📁'))+' '+esc(x.nom)+'</span><span class="s">'+x.n+'</span>'; T.appendChild(s2);
+        s2.onclick=()=>{ if(DC_OBERT.has(x.k)) DC_OBERT.delete(x.k); else DC_OBERT.add(x.k); desaObert(); pinta(); };
+        if(ob) arb(x, dep+1); }); };
+    arb(arrel, 0); });
 }
 const OBERTS=new Set();   /* projectes desplegats a la llista de resultats */
 let PROJ_PLEG=false, PROJ_VISIBLES=[];   /* v2.6: «Plegar tot» mana sobre el desplegat automàtic (pocs fitxers) */
 try{ PROJ_PLEG=localStorage.getItem('bm.projPlegats')==='1'; }catch(e){}
 function plegaTot(plega){ const t=$('fTipus').value;
-  if(t==='docs'){ if(plega) DC_VISIBLES.forEach(g=>{ DC_PLEG.add('cat:'+g.c); g.tops.forEach(x=>DC_PLEG.add(g.c+'/'+x)); }); else DC_PLEG.clear(); desaPleg(); }
+  if(t==='docs'){ if(plega){ DC_VISIBLES.forEach(g=>DC_PLEG.add('cat:'+g.c)); DC_OBERT.clear(); } else { DC_PLEG.clear(); DC_VISIBLES.forEach(g=>g.claus.forEach(k=>DC_OBERT.add(k))); } desaPleg(); desaObert(); }   /* v2.8 */
   else { PROJ_PLEG=plega; OBERTS.clear(); if(!plega) PROJ_VISIBLES.forEach(r=>OBERTS.add(r)); try{ localStorage.setItem('bm.projPlegats', plega?'1':''); }catch(e){} }
   pinta(); }
 function cercaVisible(v){ document.querySelector('#pProjectes .guia').classList.toggle('amagada', !v); $('bCercaT').textContent = v ? '▴ Amagar la cerca' : '▾ Cerca';
