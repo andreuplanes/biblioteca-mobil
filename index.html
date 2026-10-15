@@ -8,6 +8,9 @@
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v3.0: VELOCITAT DEL VÍDEO (Andreu, 16/10/2026: «un cop gravat el vídeo, podríem reduir la velocitat de reproducció, així no
+      augmentem la mida de l'arxiu i el visualitzem millor»). Al visor de vídeo, sota el vídeo, els botons 1× · ¾× · ½× · ¼×
+      (playbackRate del reproductor; l'arxiu no canvia); es recorda (bm.vidVel) i val per a tots els vídeos. Biblioteca de Projectes: v3.0.
      v2.9: ORDRE DE L'ARBRE (Andreu: «DORMA: documentació, fitxes tècniques, CAD»): 📄 DOCUMENTACIO primer, carpetes per nom, les de CAD al
       final i les «_…» del tot al final. Biblioteca de Projectes: v2.9.
      v2.8: ARBRE DE CARPETES (Andreu: «en obrir DORMA han de sortir les subcarpetes… i en obrir una subcarpeta que es desplegui el contingut»).
@@ -254,6 +257,10 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 .visor .peu button.sec, .visor .peu a.sec{ background:rgba(255,255,255,.18); }
 .visor .peu button:disabled{ opacity:.5; }
 .visor .nota{ color:#ccc; font-size:13px; padding:0 12px 6px; background:rgba(0,0,0,.75); }
+.visor .vvel{ position:absolute; left:0; right:0; top:8px; display:flex; gap:6px; justify-content:center; padding:0; pointer-events:none; }   /* v3.0: velocitat del vídeo, sobre el vídeo a dalt (els controls nadius són a baix) */
+.visor .vvel button{ pointer-events:auto; }
+.visor .vvel button{ background:#333; color:#ddd; border:1px solid #555; border-radius:999px; padding:4px 11px; font-size:13px; }
+.visor .vvel button.on{ background:#2d5fa6; border-color:#2d5fa6; color:#fff; font-weight:700; }
 /* v0.9e · HORITZONTAL (iPhone girat): imatge a tota l'alçada; títol, nota i botons en una columna a la dreta; zones segures */
 @media (orientation:landscape) and (max-height:560px){
   body{ padding-left:var(--sal); padding-right:var(--sar); }
@@ -380,7 +387,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v2.9';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v3.0';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -1004,7 +1011,7 @@ async function obreVisor(f, enviar, seq){
         +'<div class="ajuda3d">doble toc: anar-hi · dos dits: zoom i moure</div>';
       zoom3D(C.querySelector('model-viewer'), C.querySelector('#mv3dZoom'));
       control3D(C.querySelector('model-viewer')); }
-    else if(f.tipus==='video') C.innerHTML='<video controls playsinline autoplay src="'+u+'"></video>';
+    else if(f.tipus==='video'){ C.innerHTML='<video controls playsinline autoplay src="'+u+'"></video><div class="vvel" id="vVel"></div>'; velocitatVideo(C); }   /* v3.0 */
     else if(f.tipus==='imatge') C.innerHTML='<img src="'+u+'" alt="">';
     else if(f.tipus==='doc' && ext(f.nom)==='pdf'){ $('vObre').style.display=''; C.innerHTML='<div class="cad" style="color:#999">⏳ obrint el PDF…</div>';
       try{ const buf=await bytesPDF(f); if(VF!==f) return;
@@ -1020,6 +1027,12 @@ async function obreVisor(f, enviar, seq){
   }catch(e){ C.innerHTML='<div class="cad">⚠ '+esc(e.message)+'</div>'; }
   if(enviar){ if(VBLOB && VBLOB.f===f){ $('vEnvia').textContent='📤 Enviar ara'; toast('Fitxer a punt: prem «Enviar ara».'); } else envia(); }
 }
+/* v3.0 (Andreu): «reduir la velocitat de reproducció, així no augmentem la mida de l'arxiu»: botons 1× · ¾× · ½× · ¼× sota el vídeo
+   (playbackRate; l'arxiu no canvia). Es recorda a bm.vidVel i val per a tots els vídeos. */
+const VID_VELS=[[1,'1×'],[0.75,'¾×'],[0.5,'½×'],[0.25,'¼×']];
+function velocitatVideo(C){ const v=C.querySelector('video'), B=C.querySelector('#vVel'); if(!v || !B) return; let vel=1; try{ vel=parseFloat(localStorage.getItem('bm.vidVel')||'1')||1; }catch(e){}
+  const pinta=()=>{ B.innerHTML=VID_VELS.map(x=>'<button data-v="'+x[0]+'"'+(Math.abs(x[0]-vel)<0.01?' class="on"':'')+'>'+x[1]+'</button>').join(''); B.querySelectorAll('button').forEach(b=>{ b.onclick=()=>{ vel=parseFloat(b.dataset.v); v.playbackRate=vel; try{ localStorage.setItem('bm.vidVel', String(vel)); }catch(e){} pinta(); }; }); };
+  v.playbackRate=vel; v.addEventListener('loadedmetadata',()=>{ v.playbackRate=vel; }); v.addEventListener('play',()=>{ v.playbackRate=vel; }); pinta(); }
 function tancaVisor(){ SEQ=[]; SEQI=-1; $('visor').classList.remove('obert'); const v=$('vCos').querySelector('video'); if(v) v.pause(); if($('vCos')._pdf){ try{ $('vCos')._pdf.destroy(); }catch(e){} $('vCos')._pdf=null; } if($('vCos')._dxf){ try{ $('vCos')._dxf.destrueix(); }catch(e){} $('vCos')._dxf=null; } $('vCos').innerHTML=''; VF=null; VBLOB=null; }
 /* «Obrir amb…» (v0.8): és el mateix menú de compartir de l'iPhone; allà surten les apps que obren PDF (PDFelement, Llibres,
    Fitxers…). Si PDFelement no surt a la fila, «Més» i es pot posar a Favorits perquè surti sempre primer. */
