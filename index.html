@@ -3,11 +3,29 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v2.9 (15/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v3.1 (16/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v3.1: SENSE CONNEXIÓ (Andreu, 16/10/2026, a Andorra sense dades mòbils: «vull consultar la biblioteca sense connexió… tenir
+      accés als vídeos i als 3D per fer la presentació»). A la fitxa de cada projecte, «⬇ Guardar per a sense connexió»: tries
+      vídeos / 3D / imatges / PDF i es desen a l'aparell (IndexedDB, amb la mida i l'espai lliure). Sense connexió, la llista
+      només ensenya el que hi ha desat (capçalera marró, «📴 Sense connexió»), i el visor, el 3D (girar, Quiet / Moviment, AR),
+      les miniatures i 📤 Enviar funcionen amb la còpia desada. Amb connexió també es fa servir la còpia (més ràpid, sense
+      dades), tret que el fitxer hagi canviat a Dropbox («han canviat a Dropbox»: es torna a guardar). El catàleg de la
+      Biblioteca (títols, publicables) també queda desat. 🗑 Treure de l'aparell per projecte, i a ⚙ el total i «Esborrar-ho tot».
+      Fitxer nou al costat a GitHub: sw.js (service worker), que desa la pàgina i els visors perquè l'app s'obri sense internet.
+      SEMPRE TOTS ELS VÍDEOS I 3D (Andreu: «a les presentacions podem ensenyar el projecte… però també exemples d'altres projectes»;
+      triat: vídeos + 3D, automàtic amb avís): en obrir l'app amb connexió es baixen sols els vídeos i 3D nous o canviats de TOTS
+      els projectes (uns 175 MB el 16/10/2026); si falten més de 50 MB, primer pregunta (per si es va amb dades mòbils). El que ja no
+      és a Dropbox s'esborra de l'aparell. ⚙ «Tenir sempre tots els vídeos i 3D» (bm.offAuto) i «⬇ Actualitzar ara». Les imatges i
+      els PDF, a mà des de la fitxa. Biblioteca de Projectes: v3.1 (mateix número; allà sense canvis).
+      FITXES TÈCNIQUES DE PRODUCTE TAMBÉ (Andreu: «també hauríem de tenir disponible sense connexió l'apartat de les fitxes tècniques»;
+      triat: «només les fitxes de producte sense connexió, la resta amb connexió»): totes les fitxes de producte i les fitxes noves
+      (GENERADES/), en els 6 idiomes (uns 200 MB el 16/10/2026), es mantenen igual que els vídeos i 3D. El catàleg de fitxes queda
+      desat (bm.ft). Sense connexió, «📘 Fitxes tècniques» ensenya les desades; els documents generals (TechBook…) i la
+      documentació tècnica, només amb connexió.
      v3.0: VELOCITAT DEL VÍDEO (Andreu, 16/10/2026: «un cop gravat el vídeo, podríem reduir la velocitat de reproducció, així no
       augmentem la mida de l'arxiu i el visualitzem millor»). Al visor de vídeo, sota el vídeo, els botons 1× · ¾× · ½× · ¼×
       (playbackRate del reproductor; l'arxiu no canvia); es recorda (bm.vidVel) i val per a tots els vídeos. Biblioteca de Projectes: v3.0.
@@ -185,6 +203,14 @@ select.gran{ background-image:linear-gradient(45deg,transparent 50%,var(--blau2)
 .dos{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .xec{ display:flex; align-items:center; gap:8px; font-size:15px; padding:8px 4px; } .xec input[type=checkbox]{ width:22px; height:22px; } .xec select{ font-size:15px; padding:6px 8px; border:1px solid var(--linia); border-radius:8px; background:#fff; }
 .resultats{ padding:0 12px 24px; }
+/* v3.1 · sense connexió */
+.offcaixa{ margin:4px 12px 10px; padding:10px 12px; background:#eef4ea; border:1px solid #c5d8bd; border-radius:12px; font-size:14px; }
+.offcaixa button{ border:0; border-radius:10px; padding:10px 12px; font-size:15px; background:#3c7a48; color:#fff; margin:8px 8px 0 0; }
+.offcaixa button.sec{ background:#fff; color:#3c7a48; border:1px solid #3c7a48; }
+.offbar{ height:8px; background:#dfe6da; border-radius:4px; overflow:hidden; margin-top:8px; } .offbar i{ display:block; height:100%; width:0; background:#3c8a4a; transition:width .2s; }
+.offtipus label{ display:flex; gap:8px; align-items:center; padding:5px 0; font-size:15px; } .offtipus input{ width:22px; height:22px; }
+body.offline header{ background:#6b5526; }
+.offsi{ color:#3c7a48; font-weight:600; }
 .grup-proj{ margin:14px 0 6px; padding:8px 10px; background:#e9edf4; border-radius:12px; display:grid; grid-template-columns:1fr auto; grid-template-areas:'n b' 's b'; align-items:center; column-gap:8px; }
 .grup-proj .n{ grid-area:n; font-weight:700; font-size:17px; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .grup-proj .s{ grid-area:s; color:var(--blau2); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -322,6 +348,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
     <button id="bDesaConfig">Desar</button>
     <button id="bSurt" class="sec nomesDropbox">Sortir de Dropbox (esborra l'accés d'aquest mòbil)</button>
     <button id="bBuidaCau" class="sec">Tornar a llegir tots els projectes</button>
+    <div id="cOff" class="offcaixa" style="margin:14px 0 0"></div>
     <p id="infoConfig" style="font-size:13px"></p>
   </div>
 </section>
@@ -353,6 +380,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
     </div>
   </div>
   <div class="progres" id="progres"><i></i></div>
+  <div id="offSync" class="offcaixa" style="display:none"></div>
   <div class="estat" id="estat"></div>
   <div class="barra-pleg" id="barraPleg"><button id="bPlegaTot">⊟ Plegar tot</button><button id="bDesplegaTot">⊞ Desplegar tot</button><button id="bCercaT" class="cerca">▴ Amagar la cerca</button></div>   <!-- v2.6 -->
   <div class="resultats" id="targetes"></div>
@@ -363,6 +391,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
   <h2 id="fNom"></h2>
   <div class="sub" id="fSub"></div>
   <div id="fNota" style="margin:0 12px 6px;font-size:14px;color:var(--gris)"></div>
+  <div id="fOff" class="offcaixa"></div>
   <div class="seccio">🎞 Media</div>
   <div class="graella" id="fMedia"></div>
   <div class="seccio">📎 Lliurables</div>
@@ -387,7 +416,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v3.0';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v3.1';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -476,9 +505,12 @@ function urlLocal(c){ return location.origin+String(c).split('/').map((x,i)=>i?e
 async function baixaJSON(cami){
   if(LOCAL){ try{ const r=await fetch(urlLocal(cami),{ cache:'no-store' }); return r.ok ? await r.json() : null; }catch(e){ return null; } }
   try{ const r=await contingut('files/download',{ path:cami }); return await r.json(); }catch(e){ return null; } }
-async function enllacTemporal(cami){ if(LOCAL) return urlLocal(cami); const j=await rpc('files/get_temporary_link',{ path:cami }); return j.link; }
+async function enllacTemporal(cami){ if(offTe(cami) && offAlDia(cami)){ try{ const u=await offURL(cami); if(u) return u; }catch(e){} }   /* v3.1 */
+  if(OFFLINE) throw new Error('sense connexió: aquest fitxer no està desat a l\'aparell'); if(LOCAL) return urlLocal(cami); const j=await rpc('files/get_temporary_link',{ path:cami }); return j.link; }
 async function miniatura(cami){
   if(MINIS.has(cami)) return MINIS.get(cami);
+  if(offTe(cami) && tipusDe(cami)==='imatge'){ try{ const u=await offURL(cami); if(u){ MINIS.set(cami,u); return u; } }catch(e){} }   /* v3.1 */
+  if(OFFLINE) return null;
   if(LOCAL){ const u=tipusDe(cami)==='imatge'?urlLocal(cami):null; MINIS.set(cami,u); return u; }
   const e=ext(cami); if(!['jpg','jpeg','png','gif','webp','bmp','tif','tiff'].includes(e)){ MINIS.set(cami,null); return null; }
   try{ const r=await contingut('files/get_thumbnail_v2',{ resource:{ '.tag':'path', path:cami }, format:'jpeg', size:'w256h256', mode:'bestfit' }); const u=URL.createObjectURL(await r.blob()); MINIS.set(cami,u); return u; }
@@ -562,6 +594,9 @@ async function llegeixDB(){ const b=CFG.arrel.replace(/\/+$/,'')+'/'+DB_CAMI;
   const [tr,tp]=await Promise.all([dataFitxer(b+'_rev.json'), dataFitxer(b+'.json')]);
   const ordre=(tp!=null && (tr==null || tp>tr)) ? ['.json','_rev.json'] : ['_rev.json','.json'];
   let d=null; for(const x of ordre){ d=await baixaJSON(b+x); if(d) break; }
+  const kDB=LOCAL?'bm.db.panell':'bm.db';   /* v3.1: el catàleg queda desat per quan no hi ha connexió */
+  if(d){ try{ localStorage.setItem(kDB, JSON.stringify({ projectes:d.projectes||{}, fitxers:d.fitxers||{} })); }catch(e){} }
+  else { try{ const c=JSON.parse(localStorage.getItem(kDB)||'null'); if(c) d=c; }catch(e){} }
   DB={ projectes:(d&&d.projectes)||{}, fitxers:(d&&d.fitxers)||{} }; }
 
 /* ═════════════ Catàleg → el que es mostra ═════════════ */
@@ -572,7 +607,7 @@ function fx(c){ return DB.fitxers[camiRel(c)] || {}; }
 function sistemesDe(p){ const o=pj(p); const s=new Set((p.sisAuto||[]).filter(x=>!(o.sisMenys||[]).includes(x))); (o.sisMes||[]).forEach(x=>s.add(x)); return [...s]; }
 function anyDe(p){ const m=/^(\d{4})/.exec((p.meta && (p.meta.data_creacio||p.meta.data_actualitzacio))||''); if(m) return m[1]; return p.mod ? String(new Date(p.mod).getFullYear()) : ''; }
 function nomVisible(p){ const o=pj(p); if(CFG.pres) return o.nomGeneric || (sistemesDe(p).join(' · ')||'Projecte')+(p.meta && p.meta.ubicacio ? ' · '+p.meta.ubicacio : ''); return p.nom; }
-function fitxersDe(p){ let F=p.media.concat(p.lliur); if(CFG.pres) F=F.filter(f=>fx(f.cami).publicable); return F; }
+function fitxersDe(p){ let F=p.media.concat(p.lliur); if(CFG.pres) F=F.filter(f=>fx(f.cami).publicable); if(OFFLINE) F=F.filter(f=>offTe(f.cami)); return F; }
 function portadaDe(p){ const o=pj(p); if(o.portada){ const c=CFG.arrel.replace(/\/+$/,'')+'/'+o.portada; if(tipusDe(c)==='imatge') return c; } const im=fitxersDe(p).find(f=>f.tipus==='imatge'); return im?im.cami:null; }
 function dataTx(t){ if(!t) return ''; const d=new Date(t), z=n=>String(n).padStart(2,'0'); return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2); }
 
@@ -591,7 +626,7 @@ function fitxersQueQuadren(p, S, ignora){   /* fitxers del projecte p que passen
 }
 /* v2.4: projecte SENSE cap fitxer per veure que, per la resta de la tria, hi quadra (surt a la llista igualment) */
 function projecteBuit(p, S, ignora){
-  if(CFG.pres || fitxersDe(p).length) return false;
+  if(OFFLINE || CFG.pres || fitxersDe(p).length) return false;
   if(ignora!=='t' && S.t) return false; if(ignora!=='d' && S.d) return false;
   if(ignora!=='g' && S.g && p.grup!==S.g) return false;
   if(ignora!=='s' && S.s && !sistemesDe(p).includes(S.s)) return false;
@@ -623,9 +658,11 @@ async function ftLlistaPdf(dir){   /* els PDF d'una carpeta, amb la mida: [{nom,
   if(LOCAL){ const r=await fetch(urlLocal(dir)+'/',{ cache:'no-store' }); if(!r.ok) return [];
     const doc=new DOMParser().parseFromString(await r.text(),'text/html');
     return [...doc.querySelectorAll('a[href]')].map(a=>{ try{ return decodeURIComponent(a.getAttribute('href')); }catch(e){ return ''; } }).filter(n=>/\.pdf$/i.test(n) && !n.includes('/')).map(n=>({ nom:n, mida:null })); }
-  const j=await rpc('files/list_folder',{ path:dir }); return (j.entries||[]).filter(e=>e['.tag']==='file' && /\.pdf$/i.test(e.name)).map(e=>({ nom:e.name, mida:e.size })); }
+  const j=await rpc('files/list_folder',{ path:dir }); return (j.entries||[]).filter(e=>e['.tag']==='file' && /\.pdf$/i.test(e.name)).map(e=>({ nom:e.name, mida:e.size, mod:e.server_modified?Date.parse(e.server_modified):null })); }
 function carregaFitxes(){ if(FT_CARR) return FT_CARR;
-  FT_CARR=(async()=>{ const d=await baixaJSON(ftBase()+'/fitxes_tecniques.json'); FT_PROVAT=true; if(!d) return null;
+  FT_CARR=(async()=>{ let d=OFFLINE?null:await baixaJSON(ftBase()+'/fitxes_tecniques.json'); FT_PROVAT=true;
+    if(d){ try{ localStorage.setItem(LOCAL?'bm.ft.panell':'bm.ft', JSON.stringify(d)); }catch(e){} } else { try{ d=JSON.parse(localStorage.getItem(LOCAL?'bm.ft.panell':'bm.ft')||'null'); }catch(e){} }   /* v3.1 */
+    if(!d) return null;
     const out={ prod:[], gen:{}, noves:{} };
     (d.productes||[]).forEach(p=>{ const pdf={}; FT_IDIOMES.forEach(i=>{ const x=p.idiomes && p.idiomes[i]; if(x && x.pdf) pdf[i]=ftF(x.pdf, (p.familia||'')+' · '+i); }); out.prod.push({ codi:p.codi||'', familia:p.familia||'', pdf }); });
     FT_IDIOMES.forEach(i=>{ out.gen[i]=((d.generals||{})[i]||[]).filter(r=>/\.pdf$/i.test(r)).map(r=>ftF(r, 'document general · '+i)); out.noves[i]=null; });
@@ -633,6 +670,10 @@ function carregaFitxes(){ if(FT_CARR) return FT_CARR;
   return FT_CARR; }
 async function ftMides(id){   /* mides (Dropbox) de les fitxes d'aquest idioma, i les fitxes noves de GENERADES/<idioma>/ */
   if(FT_MIDES.has(id) || !FT) return; FT_MIDES.add(id);
+  if(OFFLINE){ const pre=ftBase()+'/GENERADES/'+id+'/';   /* v3.1: sense connexió, les mides i les fitxes noves surten del que hi ha desat */
+    FT.prod.map(p=>p.pdf[id]).filter(Boolean).concat(FT.gen[id]||[]).forEach(f=>{ f.mida=(OFF.meta[f.cami]||{}).mida||0; });
+    FT.noves[id]=Object.keys(OFF.meta).filter(c=>c.startsWith(pre)).sort().map(c=>{ const f=ftF(c.slice(ftBase().length+1), 'fitxa nova · '+id); f.mida=OFF.meta[c].mida; return f; });
+    return; }
   const tots=FT.prod.map(p=>p.pdf[id]).filter(Boolean).concat(FT.gen[id]||[]), dirs=[...new Set(tots.map(f=>f.cami.slice(0,f.cami.lastIndexOf('/'))))];
   for(const d of dirs){ try{ const L=await ftLlistaPdf(d), M=new Map(L.map(x=>[x.nom,x.mida])); tots.forEach(f=>{ if(f.cami.startsWith(d+'/') && M.has(f.nom)) f.mida=M.get(f.nom); }); }catch(e){} }
   try{ FT.noves[id]=(await ftLlistaPdf(ftBase()+'/GENERADES/'+id)).sort((a,b)=>a.nom.localeCompare(b.nom)).map(x=>{ const f=ftF('GENERADES/'+id+'/'+x.nom, 'fitxa nova · '+id); f.mida=x.mida; return f; }); }catch(e){ FT.noves[id]=[]; }
@@ -647,11 +688,11 @@ function pintaFitxes(){
   $('ftFam').innerHTML='<option value="">Totes les famílies</option>'+fams.map(f=>'<option value="'+esc(f)+'">'+esc(f)+'</option>').join('')+'<option value="_gen">Documents generals (TechBook, presentació…)</option>'+(nov.length?'<option value="_nov">Fitxes noves</option>':'');
   const fam=[...$('ftFam').options].some(o=>o.value===famV) ? famV : ''; $('ftFam').value=fam;
   const q=$('qCerca').value.trim().toLowerCase(), G=[];
-  if(fam!=='_gen' && fam!=='_nov') fams.filter(f=>!fam || f===fam).forEach(f=>{ const L=FT.prod.filter(p=>p.familia===f && p.pdf[id] && (!q || (p.codi+' '+p.familia).toLowerCase().includes(q))).map(p=>({ t:p.codi, f:p.pdf[id] })); if(L.length) G.push({ nom:f, L }); });
-  if(nov.length && (!fam || fam==='_nov')){ const L=nov.filter(f=>!q || f.nom.toLowerCase().includes(q)).map(f=>({ t:f.nom.replace(/\.pdf$/i,''), f })); if(L.length) G.push({ nom:'✨ Fitxes noves', L }); }
-  if(!fam || fam==='_gen'){ const L=(FT.gen[id]||[]).filter(f=>!q || f.nom.toLowerCase().includes(q)).map(f=>({ t:f.nom.replace(/\.pdf$/i,''), f })); if(L.length) G.push({ nom:'📚 Documents generals', L }); }
+  if(fam!=='_gen' && fam!=='_nov') fams.filter(f=>!fam || f===fam).forEach(f=>{ const L=FT.prod.filter(p=>p.familia===f && p.pdf[id] && (!OFFLINE || offTe(p.pdf[id].cami)) && (!q || (p.codi+' '+p.familia).toLowerCase().includes(q))).map(p=>({ t:p.codi, f:p.pdf[id] })); if(L.length) G.push({ nom:f, L }); });
+  if(nov.length && (!fam || fam==='_nov')){ const L=nov.filter(f=>(!OFFLINE || offTe(f.cami)) && (!q || f.nom.toLowerCase().includes(q))).map(f=>({ t:f.nom.replace(/\.pdf$/i,''), f })); if(L.length) G.push({ nom:'✨ Fitxes noves', L }); }
+  if(!fam || fam==='_gen'){ const L=(FT.gen[id]||[]).filter(f=>(!OFFLINE || offTe(f.cami)) && (!q || f.nom.toLowerCase().includes(q))).map(f=>({ t:f.nom.replace(/\.pdf$/i,''), f })); if(L.length) G.push({ nom:'📚 Documents generals', L }); }
   const SEQ_F=G.flatMap(g=>g.L.map(x=>x.f)), n=SEQ_F.length;
-  $('estat').innerHTML=n ? '<b>'+n+' fitxes</b> · en '+FT_NOMID[id] : '';
+  $('estat').innerHTML=(OFFLINE?'📴 <b>Sense connexió</b> · només les fitxes desades a l\'aparell'+(n?'<br>':''):'')+(n ? '<b>'+n+' fitxes</b> · en '+FT_NOMID[id] : '');   /* v3.1 */
   if(!n){ T.innerHTML='<div class="buit">Cap fitxa amb aquesta tria.</div>'; return; }
   G.forEach(g=>{ const cap=document.createElement('div'); cap.className='grup-proj obert'; cap.innerHTML='<div class="n">'+esc(g.nom)+'</div><div class="s">'+g.L.length+' · '+FT_NOMID[id]+'</div>'; T.appendChild(cap);
     g.L.forEach(({t,f})=>{ const el=document.createElement('div'); el.className='fitxer'; const gran=f.mida>PDF_MAX_PREVIA;
@@ -773,6 +814,7 @@ function pinta(){
   document.querySelector('#pProjectes .guia').classList.toggle('ft', S.t==='fitxes'); const lq=$('qCerca').closest('label').querySelector('span'); if(!lq.dataset.t0) lq.dataset.t0=lq.textContent; lq.textContent = S.t==='fitxes' ? 'Paraula (codi: 3N, PVT, TechBook…)' : lq.dataset.t0;
   document.querySelector('#pProjectes .guia').classList.toggle('dc', S.t==='docs'); if(S.t==='docs') lq.textContent='Paraula (trempat, 12150, Dorma, assaig…)';   /* v2.5 */
   $('barraPleg').style.display = S.t==='fitxes' ? 'none' : '';   /* v2.6 */
+  if(S.t==='docs' && OFFLINE){ T.innerHTML='<div class="buit">📴 La documentació tècnica necessita connexió.</div>'; $('estat').textContent=''; return; }   /* v3.1 */
   if(S.t==='fitxes') return pintaFitxes();   /* v2.1 */
   if(S.t==='docs') return pintaDocs();   /* v2.5 */
   const L=INV.map(p=>({ p, F:fitxersQueQuadren(p,S) })).filter(x=>x.F.length || projecteBuit(x.p,S));   /* v2.4 */
@@ -781,6 +823,8 @@ function pinta(){
   /* resum de la tria, en una línia */
   const NOMT={video:'vídeos','3d':'models 3D',imatge:'imatges',doc:'PDF',cad:'DWG / DXF'}; const parts=[S.t?NOMT[S.t]:'fitxers', S.s||'', S.g?GRUPS[S.g]||S.g:'', S.a||'', S.q?'«'+S.q+'»':'', S.d?'★':''].filter(Boolean);
   $('estat').innerHTML=nF?('<b>'+nF+' '+parts[0]+'</b>'+(parts.length>1?' · '+esc(parts.slice(1).join(' · ')):'')+' · a <b>'+nP+'</b> projecte'+(nP>1?'s':'')):(nP?'<b>'+nP+'</b> projecte'+(nP>1?'s':'')+' sense fitxers per veure':'');
+  if(OFFLINE) $('estat').innerHTML='📴 <b>Sense connexió</b> · només el que tens desat a l\'aparell'+($('estat').innerHTML?'<br>'+$('estat').innerHTML:'');   /* v3.1 */
+  if(!nP && OFFLINE){ T.innerHTML='<div class="buit">'+(offTotal().n?'Res desat amb aquesta tria. Prova amb menys condicions.':'No hi ha res desat a l\'aparell. Amb connexió, obre la fitxa d\'un projecte i toca «⬇ Guardar per a sense connexió».')+'</div>'; return; }
   if(!nP){ T.innerHTML='<div class="buit">'+(INV.length?'Res amb aquesta tria. Prova amb menys condicions.':'Encara no s\'ha llegit cap projecte. Prem ↻.')+'</div>'; return; }
   /* pocs fitxers → tots desplegats; molts → cada projecte plegat (un toc el desplega) */
   const desplegaTot = !PROJ_PLEG && (nF<=24 || nP===1);   /* v2.6 */
@@ -795,7 +839,7 @@ function pinta(){
     T.appendChild(cap); if(!obert) return;
     if(!F.length){ const b=document.createElement('div'); b.className='buit'; b.style.padding='8px 12px'; b.textContent='Sense fitxers per veure al mòbil'+(p.apps.length?' (carpetes: '+p.apps.join(', ')+')':'')+'.'; T.appendChild(b); return; }   /* v2.4 */
     F.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fitxer';
-      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
+      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+(offTe(f.cami)?' · <span class="offsi">📥 desat</span>':'')+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
       el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_R); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_R); T.appendChild(el);
       demanaPrevia(el.querySelector('.mini2'), f, SEQ_R); }); });
 }
@@ -804,7 +848,7 @@ function pinta(){
 function obreFitxa(p){
   OBERT=p; $('fNom').innerHTML=(pj(p).destacat?'<span class="estrella">★</span> ':'')+esc(nomVisible(p)); $('titol').textContent=nomVisible(p);
   const sub=[sistemesDe(p).join(' · '), anyDe(p), CFG.pres?'':(p.meta.client||''), p.meta.ubicacio||''].filter(Boolean).join(' · '); $('fSub').textContent=sub;
-  $('fNota').textContent=pj(p).nota||'';
+  $('fNota').textContent=pj(p).nota||''; pintaOff(p);   /* v3.1 */
   const M=$('fMedia'); M.innerHTML=''; const med=fitxersDe(p).filter(f=>f.on.toLowerCase().startsWith('media'));
   if(!med.length) M.innerHTML='<div class="buit" style="grid-column:1/-1;padding:14px">Sense vídeos ni imatges a MEDIA.</div>';
   med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f, med); });
@@ -1051,6 +1095,125 @@ async function envia(quin){
 }
 function tipusMime(n){ const e=ext(n); return ({mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',webm:'video/webm',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',gif:'image/gif',pdf:'application/pdf',glb:'model/gltf-binary',gltf:'model/gltf+json',dwg:'application/acad',dxf:'application/dxf'})[e]||'application/octet-stream'; }
 
+/* ═════════════ v3.1 · SENSE CONNEXIÓ: els fitxers triats es desen a l'aparell (IndexedDB) ═════════════ */
+let OFFLINE=false, OFF_ATURA=false; const FT_MODS=new Map();   /* camí d'una fitxa → data de Dropbox */
+const OFF={ meta:{}, urls:new Map(), db:null };   /* meta: camí → { mida, mod, desat } (localStorage 'bm.off'); els bytes, a IndexedDB */
+try{ OFF.meta=JSON.parse(localStorage.getItem(LOCAL?'bm.off.panell':'bm.off')||'{}')||{}; }catch(e){ OFF.meta={}; }
+function offDesaMeta(){ try{ localStorage.setItem(LOCAL?'bm.off.panell':'bm.off', JSON.stringify(OFF.meta)); }catch(e){} }
+function offObre(){ if(OFF.db) return OFF.db;
+  OFF.db=new Promise((ok,ko)=>{ const r=indexedDB.open(LOCAL?'bm-sense-connexio-panell':'bm-sense-connexio',1); r.onupgradeneeded=()=>r.result.createObjectStore('f'); r.onsuccess=()=>ok(r.result); r.onerror=()=>{ OFF.db=null; ko(r.error); }; });
+  return OFF.db; }
+async function offOp(mode, fn){ const db=await offObre(); return new Promise((ok,ko)=>{ const t=db.transaction('f',mode), r=fn(t.objectStore('f'));
+  t.oncomplete=()=>ok(r ? r.result : undefined); t.onerror=()=>ko(t.error); t.onabort=()=>ko(t.error||new Error('no s\'ha pogut desar')); }); }
+function offTe(c){ return !!OFF.meta[c]; }
+function offAlDia(c){ const m=OFF.meta[c]; if(!m) return false; if(OFFLINE) return true;
+  const e=ENTRADES[String(c).toLowerCase()], t=e && e.server_modified ? Date.parse(e.server_modified) : (FT_MODS.get(c)||null); return !t || !m.mod || t<=m.mod; }
+async function offURL(c){ if(OFF.urls.has(c)) return OFF.urls.get(c);
+  const b=await offOp('readonly', s=>s.get(c)); if(!b){ delete OFF.meta[c]; offDesaMeta(); return null; }   /* l'aparell l'ha esborrat */
+  const u=URL.createObjectURL(b); OFF.urls.set(c,u); return u; }
+function offOblida(c){ const u=OFF.urls.get(c); if(u){ URL.revokeObjectURL(u); OFF.urls.delete(c); } MINIS.delete(c); MINIS.delete('3d:'+c); MINIS.delete('pdf:'+c); PDFBYTES.delete(c); }
+async function offPosa(c, blob, mod){ await offOp('readwrite', s=>s.put(blob, c)); OFF.meta[c]={ mida:blob.size, mod:mod||Date.now(), desat:Date.now() }; offDesaMeta(); offOblida(c); }
+async function offTreu(c){ try{ await offOp('readwrite', s=>s.delete(c)); }catch(e){} delete OFF.meta[c]; offDesaMeta(); offOblida(c); }
+function offTotal(){ const v=Object.values(OFF.meta); return { n:v.length, mida:v.reduce((a,m)=>a+(m.mida||0),0) }; }
+function esErrorXarxa(e){ return !navigator.onLine || !!(e && (e.name==='TypeError' || /failed to fetch|load failed|network|internet|connexi/i.test(e.message||''))); }
+function posaOffline(si){ OFFLINE=!!si; document.body.classList.toggle('offline', OFFLINE); }
+function fitxersOffDe(p){ return fitxersDe(p).filter(f=>f.tipus==='video' || f.tipus==='3d' || f.tipus==='imatge' || (f.tipus==='doc' && ext(f.nom)==='pdf')); }
+function pintaOff(p){ const B=$('fOff'); if(!B) return; const F=fitxersOffDe(p), d=F.filter(f=>offTe(f.cami)), vells=d.filter(f=>!offAlDia(f.cami)), mida=d.reduce((a,f)=>a+((OFF.meta[f.cami]||{}).mida||0),0);
+  if(OFFLINE){ B.innerHTML='📴 <b>Sense connexió</b> · '+d.length+' fitxer'+(d.length===1?'':'s')+' desat'+(d.length===1?'':'s')+' a l\'aparell ('+midaTx(mida)+')'; return; }
+  if(!F.length){ B.innerHTML='<b>📥 Sense connexió</b> · aquest projecte no té vídeos, 3D, imatges ni PDF per guardar.'; return; }
+  B.innerHTML='<b>📥 Sense connexió</b> · '+(d.length ? d.length+' de '+F.length+' fitxers desats a l\'aparell ('+midaTx(mida)+')'+(vells.length?' · <b style="color:#a0522d">'+vells.length+' han canviat a Dropbox</b>':'') : 'res desat a l\'aparell encara')
+    +'<div><button id="bOffDesa">⬇ Guardar per a sense connexió</button>'+(d.length?'<button id="bOffTreu" class="sec">🗑 Treure de l\'aparell</button>':'')+'</div>';
+  $('bOffDesa').onclick=()=>dialegOff(p);
+  if(d.length){ const bt=$('bOffTreu'); bt.onclick=async()=>{ if(!bt.dataset.segur){ bt.dataset.segur='1'; bt.textContent='Toca un altre cop per treure\'ls'; setTimeout(()=>{ if(bt.isConnected){ delete bt.dataset.segur; bt.textContent='🗑 Treure de l\'aparell'; } }, 4000); return; }
+    for(const f of d) await offTreu(f.cami); toast('Tret de l\'aparell.'); obreFitxa(p); }; }
+}
+function dialegOff(p){ const B=$('fOff'), F=fitxersOffDe(p), T={ video:'🎬 Vídeos', '3d':'🧊 Models 3D', imatge:'🖼 Imatges', doc:'📄 PDF' }, per={};
+  F.forEach(f=>{ (per[f.tipus]=per[f.tipus]||[]).push(f); });
+  B.innerHTML='<b>Què vols guardar a l\'aparell?</b><div class="offtipus">'+Object.keys(T).filter(k=>per[k]).map(k=>{ const L=per[k], m=L.reduce((a,f)=>a+(f.mida||0),0), j=L.filter(f=>offTe(f.cami) && offAlDia(f.cami)).length;
+      return '<label><input type="checkbox" data-t="'+k+'"'+(k!=='doc'?' checked':'')+'> '+T[k]+' · '+L.length+' ('+midaTx(m)+')'+(j?' · <span class="offsi">'+j+' ja desat'+(j===1?'':'s')+'</span>':'')+'</label>'; }).join('')
+    +'</div><div id="offLliure" style="color:var(--gris);font-size:13px"></div><div><button id="bOffVa">⬇ Guardar</button><button id="bOffNo" class="sec">Cancel·lar</button></div>';
+  try{ if(navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e=>{ const x=$('offLliure'); if(x && e && e.quota) x.textContent='Espai que encara pot fer servir l\'app: '+midaTx(Math.max(0,e.quota-(e.usage||0))); }).catch(()=>{}); }catch(e){}
+  $('bOffNo').onclick=()=>pintaOff(p);
+  $('bOffVa').onclick=()=>{ const tt=[...B.querySelectorAll('input[data-t]:checked')].map(i=>i.dataset.t), L=F.filter(f=>tt.includes(f.tipus)); if(!L.length){ toast('Tria almenys un tipus.'); return; } baixaOff(p, L); };
+}
+/* bucle comú: baixa la llista L a l'aparell; pin(fets, total, n, de) per a la barra. Retorna { n, errs, aturat } */
+async function baixaLlista(L, pin){ OFF_ATURA=false; let wl=null;
+  try{ if(navigator.storage && navigator.storage.persist) await navigator.storage.persist(); }catch(e){}
+  try{ if(navigator.wakeLock) wl=await navigator.wakeLock.request('screen'); }catch(e){}   /* que la pantalla no s'apagui mentre baixa */
+  const total=L.reduce((a,f)=>a+(f.mida||0),0)||1; let fet=0, n=0; const errs=[]; pin(0, total, 0, L.length);
+  for(const f of L){ if(OFF_ATURA) break;
+    try{ const u=LOCAL ? urlLocal(f.cami) : (await rpc('files/get_temporary_link',{ path:f.cami })).link;
+      const r=await fetch(u); if(!r.ok) throw new Error('HTTP '+r.status); let blob;
+      if(r.body && r.body.getReader){ const rd=r.body.getReader(), parts=[]; let b=0;
+        for(;;){ if(OFF_ATURA){ try{ rd.cancel(); }catch(e){} break; } const x=await rd.read(); if(x.done) break; parts.push(x.value); b+=x.value.length; pin(fet+b, total, n, L.length); }
+        if(OFF_ATURA) break; blob=new Blob(parts,{ type:tipusMime(f.nom) }); }
+      else blob=new Blob([await r.blob()],{ type:tipusMime(f.nom) });
+      await offPosa(f.cami, blob, f.mod); fet+=f.mida||blob.size; n++; pin(fet, total, n, L.length);
+    }catch(e){ if(e && e.name==='QuotaExceededError'){ errs.push('no hi cap més a l\'aparell'); break; } if(esErrorXarxa(e) && !navigator.onLine){ errs.push('s\'ha perdut la connexió'); break; } errs.push(f.nom+': '+(e && e.message || e)); fet+=f.mida||0; }
+  }
+  try{ if(wl) await wl.release(); }catch(e){}
+  return { n, errs, aturat:OFF_ATURA };
+}
+function resumBaixada(R, ok){ if(R.aturat) toast('Aturat: '+R.n+' fitxer'+(R.n===1?'':'s')+' desat'+(R.n===1?'':'s')+'.');
+  else if(R.errs.length) toast('⚠ '+R.n+' desats; '+R.errs.length+' amb error: '+R.errs.slice(0,2).join(' · '), 10000);
+  else toast(ok, 5000); }
+async function baixaOff(p, L){ const B=$('fOff'), cal=L.filter(f=>!(offTe(f.cami) && offAlDia(f.cami)));
+  B.innerHTML='<b>⬇ Guardant a l\'aparell…</b> <span id="offTx"></span><div class="offbar"><i id="offBar"></i></div><div style="font-size:13px;color:var(--gris);margin-top:6px">Deixa l\'app oberta i la pantalla encesa fins que acabi.</div><button id="bOffAtura" class="sec">Aturar</button>';
+  $('bOffAtura').onclick=()=>{ OFF_ATURA=true; };
+  const R=await baixaLlista(cal, (fet,total,n,de)=>{ const t=$('offTx'), b=$('offBar'); if(!t) return; t.textContent=Math.min(de,n+1)+' / '+de+' · '+midaTx(fet)+' de '+midaTx(total); b.style.width=Math.min(100,fet/total*100)+'%'; });
+  resumBaixada(R, '✓ Desat a l\'aparell: ja ho pots veure sense connexió.');
+  if(OBERT===p && $('pFitxa').classList.contains('activa')){ const y=window.scrollY; obreFitxa(p); window.scrollTo(0,y); }
+}
+/* ── SEMPRE TOTS ELS VÍDEOS I 3D (Andreu, 16/10/2026: «tenir els vídeos i els 3D de tots els projectes visibles sense internet»).
+   En obrir l'app amb connexió (i amb ↻): es baixen els nous o canviats; si falten més de 50 MB, primer es pregunta. El que ja no
+   és a Dropbox s'esborra de l'aparell (només després d'una lectura bona de Dropbox). ── */
+const OFF_AUTO_TIPUS=['video','3d'], OFF_AVIS=50e6;
+let OFF_SYNC=false, OFF_DESPRES=false;
+function offAuto(){ try{ return localStorage.getItem('bm.offAuto')!=='0'; }catch(e){ return true; } }
+function offPendents(){ return INV.flatMap(p=>p.media.concat(p.lliur)).filter(f=>OFF_AUTO_TIPUS.includes(f.tipus) && !(offTe(f.cami) && offAlDia(f.cami))); }
+async function offNeteja(FTL){ if(!INV.length) return 0; const vius=new Set(INV.flatMap(p=>p.media.concat(p.lliur)).map(f=>f.cami)), ftb=ftBase()+'/'; let n=0;
+  const ftOk=!!(FTL && FTL.complet); if(ftOk) FTL.L.forEach(f=>vius.add(f.cami));
+  for(const c of Object.keys(OFF.meta)){ if(c.startsWith(ftb) && !ftOk) continue; if(!vius.has(c)){ await offTreu(c); n++; } } return n; }
+/* totes les fitxes de producte i les fitxes noves, en tots els idiomes, amb la mida i la data de Dropbox (sense els documents generals) */
+async function ftPerSync(){ if(!FT) await carregaFitxes(); if(!FT) return null; const out=[], vist=new Set(); let complet=true;
+  for(const id of FT_IDIOMES){ const tots=FT.prod.map(p=>p.pdf[id]).filter(Boolean), dirs=[...new Set(tots.map(f=>f.cami.slice(0,f.cami.lastIndexOf('/'))))];
+    for(const d of dirs){ let L; try{ L=await ftLlistaPdf(d); }catch(e){ complet=false; continue; } const M=new Map(L.map(x=>[x.nom,x]));
+      tots.forEach(f=>{ if(f.cami.slice(0,f.cami.lastIndexOf('/'))!==d || !M.has(f.nom) || vist.has(f.cami)) return; const x=M.get(f.nom); f.mida=x.mida; f.mod=x.mod; if(x.mod) FT_MODS.set(f.cami,x.mod); vist.add(f.cami); out.push(f); }); }
+    let nv=[]; try{ nv=await ftLlistaPdf(ftBase()+'/GENERADES/'+id); }catch(e){ if(esErrorXarxa(e)) complet=false; }
+    nv.forEach(x=>{ const f=ftF('GENERADES/'+id+'/'+x.nom, 'fitxa nova · '+id); if(vist.has(f.cami)) return; f.mida=x.mida; f.mod=x.mod; if(x.mod) FT_MODS.set(f.cami,x.mod); vist.add(f.cami); out.push(f); }); }
+  return { L:out, complet }; }
+function bandaSync(html){ const B=$('offSync'); if(!B) return; B.style.display=html?'':'none'; B.innerHTML=html||''; }
+async function sincronitzaOff(ara){
+  if(LOCAL || OFFLINE || OFF_SYNC || !INV.length) return; OFF_SYNC=true;
+  try{ const au=offAuto() || ara; let FTL=null; if(au){ try{ FTL=await ftPerSync(); }catch(e){ FTL=null; } }
+    await offNeteja(FTL); if(!au) return;
+    const L=offPendents().concat(FTL ? FTL.L.filter(f=>!(offTe(f.cami) && offAlDia(f.cami))) : []), mida=L.reduce((a,f)=>a+(f.mida||0),0);
+    if(!L.length){ bandaSync(''); if(ara) toast('✓ Tots els vídeos, 3D i fitxes tècniques ja són a l\'aparell.'); return; }
+    if(!ara && (OFF_DESPRES || mida>OFF_AVIS)){
+      if(OFF_DESPRES) return;
+      bandaSync('<b>📥 Sense connexió</b> · falten '+L.length+' fitxers (vídeos, 3D i fitxes tècniques) · '+midaTx(mida)+' · per tenir-los a l\'aparell. Millor amb Wi-Fi.<div><button id="bSyncVa">⬇ Baixar ara</button><button id="bSyncNo" class="sec">Més tard</button></div>');
+      $('bSyncVa').onclick=()=>{ OFF_SYNC=false; sincronitzaOff(true); }; $('bSyncNo').onclick=()=>{ OFF_DESPRES=true; bandaSync(''); }; return; }
+    bandaSync('<b>📥 Preparant sense connexió…</b> <span id="syncTx"></span><div class="offbar"><i id="syncBar"></i></div><button id="bSyncAtura" class="sec">Aturar</button>');
+    $('bSyncAtura').onclick=()=>{ OFF_ATURA=true; OFF_DESPRES=true; };
+    const R=await baixaLlista(L, (fet,total,n,de)=>{ const t=$('syncTx'), b=$('syncBar'); if(!t) return; t.textContent=Math.min(de,n+1)+' / '+de+' · '+midaTx(fet)+' de '+midaTx(total); b.style.width=Math.min(100,fet/total*100)+'%'; });
+    bandaSync(''); resumBaixada(R, '✓ Tots els vídeos, 3D i fitxes tècniques són a l\'aparell: es poden veure sense connexió.');
+    if($('pProjectes').classList.contains('activa')) pinta(); if($('pConfig').classList.contains('activa')) pintaOffConfig();
+  } finally { OFF_SYNC=false; }
+}
+function pintaOffConfig(){ const B=$('cOff'); if(!B) return; const t=offTotal(), au=offAuto();
+  B.innerHTML='<b>📥 Sense connexió</b> · a l\'aparell: '+(t.n ? t.n+' fitxers · '+midaTx(t.mida) : 'res')
+    +'<label class="xec" style="padding:8px 0 0"><input type="checkbox" id="cOffAuto"'+(au?' checked':'')+'> Tenir sempre tots els vídeos i 3D dels projectes i totes les fitxes tècniques de producte, en tots els idiomes (es baixen sols els nous; si són més de 50 MB, pregunta)</label>'
+    +'<div>'+(LOCAL?'':'<button id="bOffAra">⬇ Actualitzar ara</button>')+(t.n?'<button id="bOffTot" class="sec">🗑 Esborrar-ho tot de l\'aparell</button>':'')+'</div>'
+    +'<div style="font-size:13px;color:var(--gris);margin-top:6px">Imatges i PDF dels projectes: des de la fitxa de cada projecte («⬇ Guardar per a sense connexió»). Documents generals (TechBook…) i documentació tècnica: només amb connexió. No esborra res de Dropbox.</div>';
+  $('cOffAuto').onchange=e=>{ try{ localStorage.setItem('bm.offAuto', e.target.checked?'1':'0'); }catch(x){} if(e.target.checked){ OFF_DESPRES=false; sincronitzaOff(); } };
+  if($('bOffAra')) $('bOffAra').onclick=()=>{ if(OFFLINE || !navigator.onLine){ toast('📴 Cal connexió.'); return; } OFF_DESPRES=false; sincronitzaOff(true); toast('⬇ Actualitzant… ho veuràs a la llista de projectes.'); };
+  if(t.n){ const bt=$('bOffTot'); bt.onclick=async()=>{ if(!bt.dataset.segur){ bt.dataset.segur='1'; bt.textContent='Toca un altre cop per esborrar-ho tot'; setTimeout(()=>{ if(bt.isConnected){ delete bt.dataset.segur; bt.textContent='🗑 Esborrar-ho tot de l\'aparell'; } }, 4000); return; }
+    for(const c of Object.keys(OFF.meta)) await offTreu(c); try{ localStorage.setItem('bm.offAuto','0'); }catch(x){} toast('Esborrat de l\'aparell (i «tenir sempre» desactivat).'); pintaOffConfig(); }; }
+}
+window.addEventListener('offline',()=>{ posaOffline(true); if($('pProjectes').classList.contains('activa')) pinta(); if(OBERT && $('pFitxa').classList.contains('activa')) obreFitxa(OBERT); });
+window.addEventListener('online',()=>{ posaOffline(false); FT_MIDES.clear(); setTimeout(()=>sincronitzaOff(), 3000); if($('pProjectes').classList.contains('activa')) pinta(); if(OBERT && $('pFitxa').classList.contains('activa')) pintaOff(OBERT); });
+if(!LOCAL && 'serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('sw.js').catch(()=>{});   /* l'app s'obre sense internet */
+
 /* ═════════════ Arrencada ═════════════ */
 async function comprovaCompte(){
   /* qui ha entrat: el nom i el correu surten a ⚙; si hi ha llista de permesos i no hi és, fora */
@@ -1063,26 +1226,28 @@ async function arrencaLocal(){
   document.body.classList.add('local'); if(!DINS) $('bTancaPanell').style.display='';   /* «Sense marc» al PANELL: ✕ torna al menú; dins del marc ja hi és a la barra de dalt */ $('titol').textContent=DINS?'Biblioteca de Projectes':'Biblioteca · PANELL (prova)';   // dins del marc d'iPhone, el títol que tindrà al mòbil $('cPres').checked=CFG.pres;
   mostra('pProjectes'); const hiHaCau=llegeixCau(); if(hiHaCau) pinta();
   try{ await llegeixDB(); await llegeixTot(); }
-  catch(e){ $('estat').textContent='⚠ '+e.message+' · cal obrir-la amb el PANELL engegat'; progres(null); }
+  catch(e){ if(hiHaCau && esErrorXarxa(e)){ posaOffline(true); progres(null); pinta(); return; } $('estat').textContent='⚠ '+e.message+' · cal obrir-la amb el PANELL engegat'; progres(null); }
 }
 async function arrenca(){
   if(LOCAL) return arrencaLocal();
-  llegeixToken();
+  llegeixToken(); posaOffline(!navigator.onLine);   /* v3.1 */
   $('cClau').value=CFG.clau; $('cArrel').value=CFG.arrel; $('cPres').checked=CFG.pres; $('cPrev').checked=CFG.previes;
   const code=new URLSearchParams(location.search).get('code'), err=new URLSearchParams(location.search).get('error_description');
   if(err){ toast('Dropbox: '+err, 8000); history.replaceState(null,'',REDIRECT); }
   if(code){ try{ await acabaEntrada(code); if(!(await comprovaCompte())) return; }catch(e){ toast('No s\'ha pogut entrar: '+e.message, 8000); } }
   if(!TOKEN.refresh && !TOKEN.access){ $('avisClau').style.display=CFG.clau?'none':''; mostra('pEntrada'); return; }
   /* v0.9c: la porta del compte també en obrir (no només en entrar): si el compte desat no és a la llista, es torna a preguntar a Dropbox */
-  if(USUARIS_PERMESOS.length && !code){ const desat=(localStorage.getItem('bm.compte')||'').split(' · ')[0].toLowerCase();
+  if(USUARIS_PERMESOS.length && !code && !OFFLINE){ const desat=(localStorage.getItem('bm.compte')||'').split(' · ')[0].toLowerCase();
     if(!USUARIS_PERMESOS.map(x=>x.toLowerCase()).includes(desat)){ try{ if(!(await comprovaCompte())) return; }catch(e){} } }
   mostra('pProjectes'); const hiHaCau=llegeixCau(); if(hiHaCau) pinta();
-  try{ await llegeixDB(); if(hiHaCau){ pinta(); await actualitza(); } else await llegeixTot(); }
-  catch(e){ if(/cal entrar|invalid_grant|401/.test(e.message)){ surt(); toast('Cal tornar a entrar a Dropbox.'); } else { $('estat').textContent='⚠ '+e.message; progres(null); toast('⚠ '+e.message, 8000); } }
+  try{ await llegeixDB(); if(OFFLINE){ pinta(); return; } if(hiHaCau){ pinta(); await actualitza(); } else await llegeixTot(); sincronitzaOff(); }
+  catch(e){ if(/cal entrar|invalid_grant|401/.test(e.message)){ surt(); toast('Cal tornar a entrar a Dropbox.'); }
+    else if(esErrorXarxa(e)){ posaOffline(true); progres(null); pinta(); toast('📴 Sense connexió: es veu el que tens desat a l\'aparell.', 5000); }   /* v3.1 */
+    else { $('estat').textContent='⚠ '+e.message; progres(null); toast('⚠ '+e.message, 8000); } }
 }
 $('bEntra').onclick=entra;
 $('bConfig').onclick=()=>{ $('cVersio').textContent=APP_VERSION; $('infoConfig').innerHTML=LOCAL?'Mode PANELL (prova a l\'ordinador): llegeix el disc a través del servidor del PANELL. Al mòbil llegirà el Dropbox.'
-    :'Compte: <b>'+esc(localStorage.getItem('bm.compte')||'—')+'</b><br>Pàgina: '+esc(REDIRECT)+' (ha de ser la Redirect URI de l\'app de Dropbox)'; mostra('pConfig'); };
+    :'Compte: <b>'+esc(localStorage.getItem('bm.compte')||'—')+'</b><br>Pàgina: '+esc(REDIRECT)+' (ha de ser la Redirect URI de l\'app de Dropbox)'; pintaOffConfig(); mostra('pConfig'); };
 $('bEnrere').onclick=()=>{ if($('pFitxa').classList.contains('activa')||$('pConfig').classList.contains('activa')){ $('titol').textContent='Biblioteca de Projectes'; mostra(LOCAL||TOKEN.refresh||TOKEN.access?'pProjectes':'pEntrada'); } };
 /* v2.6 · plegar tot / amagar la cerca */
 $('bPlegaTot').onclick=()=>plegaTot(true); $('bDesplegaTot').onclick=()=>plegaTot(false);
@@ -1091,8 +1256,9 @@ try{ if(localStorage.getItem('bm.cercaAmagada')==='1') cercaVisible(false); }cat
 $('bDesaConfig').onclick=()=>{ CFG.clau=$('cClau').value.trim(); CFG.arrel=$('cArrel').value.trim()||'/PANELL'; if(!CFG.arrel.startsWith('/')) CFG.arrel='/'+CFG.arrel; CFG.pres=$('cPres').checked; CFG.previes=$('cPrev').checked; localStorage.setItem('bm.previes',CFG.previes?'1':'0');
   localStorage.setItem('bm.clau',CFG.clau); localStorage.setItem('bm.arrel',CFG.arrel); localStorage.setItem('bm.pres',CFG.pres?'1':'0'); toast('Desat.'); $('bEnrere').onclick(); pinta(); };
 $('bSurt').onclick=()=>{ localStorage.removeItem('bm.compte'); surt(); toast('Accés esborrat d\'aquest mòbil.'); };
-$('bBuidaCau').onclick=async()=>{ localStorage.removeItem('bm.cau'); CURSOR=null; ENTRADES={}; INV=[]; mostra('pProjectes'); try{ await llegeixTot(); }catch(e){ toast('⚠ '+e.message,8000); } };
-$('bActualitza').onclick=async()=>{ try{ await llegeixDB(); await actualitza(); toast('Al dia.'); }catch(e){ toast('⚠ '+e.message,8000); } };
+$('bBuidaCau').onclick=async()=>{ localStorage.removeItem('bm.cau'); CURSOR=null; ENTRADES={}; INV=[]; mostra('pProjectes'); try{ await llegeixTot(); sincronitzaOff(); }catch(e){ toast('⚠ '+e.message,8000); } };
+$('bActualitza').onclick=async()=>{ if(!navigator.onLine){ toast('📴 Sense connexió: es veu el que tens desat a l\'aparell.'); return; }   /* v3.1 */
+  try{ await llegeixDB(); await actualitza(); posaOffline(false); pinta(); toast('Al dia.'); OFF_DESPRES=false; sincronitzaOff(); }catch(e){ if(esErrorXarxa(e)){ posaOffline(true); pinta(); toast('📴 Sense connexió.'); } else toast('⚠ '+e.message,8000); } };
 ['qCerca','fGrup','fSis','fAny','fTipus','fDest','fOrdre','ftFam','ftId','dcCat','dcSub','dcId'].forEach(id=>{ $(id).addEventListener('input',pinta); $(id).addEventListener('change',pinta); });
 $('vTanca').onclick=tancaVisor;
 /* v2.0: ‹ › · lliscar a dreta / esquerra (no al 3D ni al DXF; al PDF només sense ampliar) · ← → al teclat */
