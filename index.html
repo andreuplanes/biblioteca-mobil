@@ -3,11 +3,14 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v3.2 (18/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v3.2b (18/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v3.2b: CORRECCIÓ (Andreu, 18/10: «a la d'escriptori surten PROPOSTA INICIAL / OPCIO 1 PORTA, però a la mòbil no»). En obrir, la
+      Mòbil fa servir l'inventari desat a l'aparell i només el refà si Dropbox ha canviat; el desat per la v3.1 no tenia variants i, sense
+      canvis a Dropbox, no es refeia. Ara, si l'inventari desat no porta variants, es refà sempre (un sol cop). I el 🕘 dels «_anterior» també a la llista de resultats (com a l'ordinador). Biblioteca de Projectes: v3.2b.
      v3.2: VARIANTS DE PROJECTE (Andreu, 17/10/2026: «és important que a la Biblioteca Mòbil ens arribin els projectes i les
       variants que estan dins del projecte»; de Mampares v6.16). A MAMPARES/ es llegeixen el fitxer de sempre i els germans
       <P>__<SLUG>_mampares(_rev).json (mana el _rev); el nom humà és el camp «variant» del JSON, i els sistemes (HSW corredissa,
@@ -431,7 +434,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v3.2';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v3.2b';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -586,7 +589,8 @@ async function actualitza(){
   $('estat').textContent='⏳ buscant canvis…'; progres(0.1);
   try{ let j=await rpc('files/list_folder/continue',{ cursor:CURSOR }); let n=0;
     for(;;){ j.entries.forEach(e=>{ if(e['.tag']==='deleted'){ Object.keys(ENTRADES).forEach(k=>{ if(k===e.path_lower||k.startsWith(e.path_lower+'/')) delete ENTRADES[k]; }); } else ENTRADES[e.path_lower]=e; }); n+=j.entries.length; if(!j.has_more) break; j=await rpc('files/list_folder/continue',{ cursor:j.cursor }); }
-    CURSOR=j.cursor; if(n){ await reconstrueix(); } desaCau(); if(!n){ $('estat').textContent='✓ al dia · '+INV.length+' projectes'; progres(null); pinta(); }
+    const vell=INV.some(p=>!Array.isArray(p.variants));   /* v3.2b: la memòria desada per la v3.1 no té variants → es refà l'inventari encara que Dropbox no hagi canviat */
+    CURSOR=j.cursor; if(n || vell){ await reconstrueix(); } desaCau(); if(!n && !vell){ $('estat').textContent='✓ al dia · '+INV.length+' projectes'; progres(null); pinta(); }
   }catch(e){ if(/reset/i.test(e.message)){ await llegeixTot(); } else throw e; }
 }
 async function reconstrueix(){
@@ -879,7 +883,7 @@ function pinta(){
     T.appendChild(cap); if(!obert) return;
     if(!F.length){ const b=document.createElement('div'); b.className='buit'; b.style.padding='8px 12px'; b.textContent='Sense fitxers per veure al mòbil'+(p.apps.length?' (carpetes: '+p.apps.join(', ')+')':'')+'.'; T.appendChild(b); return; }   /* v2.4 */
     F.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fitxer';
-      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', (teVariants(p) && grupVar(p,f)!==null)?'◆ '+nomVar(p,grupVar(p,f)):'', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+(offTe(f.cami)?' · <span class="offsi">📥 desat</span>':'')+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
+      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+(esAnt(f)?'🕘 ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', (teVariants(p) && grupVar(p,f)!==null)?'◆ '+nomVar(p,grupVar(p,f)):'', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+(offTe(f.cami)?' · <span class="offsi">📥 desat</span>':'')+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
       el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_R); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_R); T.appendChild(el);
       demanaPrevia(el.querySelector('.mini2'), f, SEQ_R); }); });
 }
