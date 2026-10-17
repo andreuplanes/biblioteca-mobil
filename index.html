@@ -3,11 +3,23 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v3.1 (16/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v3.2 (18/10/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v3.2: VARIANTS DE PROJECTE (Andreu, 17/10/2026: «és important que a la Biblioteca Mòbil ens arribin els projectes i les
+      variants que estan dins del projecte»; de Mampares v6.16). A MAMPARES/ es llegeixen el fitxer de sempre i els germans
+      <P>__<SLUG>_mampares(_rev).json (mana el _rev); el nom humà és el camp «variant» del JSON, i els sistemes (HSW corredissa,
+      FSW plegable, Portes batents, Fixos de vidre) surten de particio.sistema de CADA variant (com fa la Biblioteca de Projectes).
+      Cada fitxer amb <P>__<SLUG>_ al nom va amb la seva variant; el 3D i els vídeos de MEDIA sense sufix i el que hi ha a
+      MAMPARES/ sense sufix van amb el fitxer de sempre; la resta (fotos, PDF, altres apps) és COMÚ. Un slug amb fitxers però
+      sense JSON (variant reanomenada) és «orfe»: surt amb el slug com a nom. LLISTA: «N variants» a la línia del projecte i el
+      nom de la variant a cada fitxer; la paraula de la cerca també busca als noms de les variants. FITXA: a dalt el comú (Media i
+      Lliurables), a sota un bloc ◆ per variant (nom · fitxer del projecte · sistemes) amb el seu 3D, vídeos i plànols; un toc al
+      títol el plega. Els «_anterior» van al final del seu bloc, amb 🕘. Un projecte sense variants es veu com abans. Mode
+      presentació: el nom de la variant sí que surt. Sense connexió: ja baixava tot MEDIA (també les variants); sense canvis.
+      Els JSON de les variants només es tornen a baixar si han canviat. Biblioteca de Projectes: v3.2 (el mateix).
      v3.1: SENSE CONNEXIÓ (Andreu, 16/10/2026, a Andorra sense dades mòbils: «vull consultar la biblioteca sense connexió… tenir
       accés als vídeos i als 3D per fer la presentació»). A la fitxa de cada projecte, «⬇ Guardar per a sense connexió»: tries
       vídeos / 3D / imatges / PDF i es desen a l'aparell (IndexedDB, amb la mida i l'espai lliure). Sense connexió, la llista
@@ -231,6 +243,8 @@ body.offline header{ background:#6b5526; }
 .fitxa h2{ font-size:18px; margin:12px 12px 2px; }
 .fitxa .sub{ color:var(--blau2); margin:0 12px 10px; font-size:14px; }
 .seccio{ margin:14px 12px 0; font-weight:600; color:var(--gris); font-size:13px; text-transform:uppercase; letter-spacing:.04em; }
+.seccio.var{ margin-top:18px; padding:8px 10px; background:var(--carta); border:1px solid var(--linia); border-radius:10px; color:var(--blau); cursor:pointer; user-select:none; }   /* v3.2 */
+.seccio.var .vsub{ display:block; text-transform:none; letter-spacing:0; font-weight:400; color:var(--gris); font-size:12px; margin-top:2px; }
 .graella{ padding:8px 12px; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
 @media(min-width:560px){ .graella{ grid-template-columns:repeat(5,1fr); } }
 .mini{ background:var(--carta); border-radius:10px; overflow:hidden; aspect-ratio:1; position:relative; display:flex; align-items:center; justify-content:center; font-size:30px; color:#9b998f; box-shadow:0 1px 2px rgba(0,0,0,.08); }
@@ -392,10 +406,11 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
   <div class="sub" id="fSub"></div>
   <div id="fNota" style="margin:0 12px 6px;font-size:14px;color:var(--gris)"></div>
   <div id="fOff" class="offcaixa"></div>
-  <div class="seccio">🎞 Media</div>
+  <div class="seccio" id="sMedia">🎞 Media</div>
   <div class="graella" id="fMedia"></div>
-  <div class="seccio">📎 Lliurables</div>
+  <div class="seccio" id="sLliur">📎 Lliurables</div>
   <div class="llista" id="fLliur"></div>
+  <div id="fVars"></div>   <!-- v3.2 · un bloc per variant -->
   <div style="height:30px"></div>
 </section>
 
@@ -416,7 +431,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v3.1';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v3.2';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -440,6 +455,23 @@ const SUBS = { MAMPARES:'Mampares', VIDRES:'Vidres', MARQUESINA:'Marquesines', P
 const TIPUS_PROJ = { mampares:'Mampares', pvt:'Baranes PVT', pbr:'Baranes PBR', marquesina:'Marquesines', marquesines:'Marquesines', portes:'Portes', pergoles:'Pèrgoles', vidres:'Vidres' };
 const EXT_VID = ['mp4','webm','mov','m4v'], EXT_IMG = ['png','jpg','jpeg','webp','gif','svg'], EXT_DOC = ['pdf'], EXT_CAD = ['dwg','dxf','skp','3dm','step','stp'], EXT_3D = ['glb','gltf'];
 const FORA = new Set(['_antics','__pycache__','.git','_copies','_paperera']);
+/* v3.2 · VARIANTS DE PROJECTE (Mampares v6.16): <P>_mampares(_rev).json = fitxer de sempre (slug ''), <P>__<SLUG>_mampares(_rev).json = variant;
+   els fitxers <P>__<SLUG>_… van amb la variant SLUG. Nom humà al camp «variant» del JSON. */
+const RE_VJSON = /_mampares(_rev)?\.json$/i;
+function slugDe(nom, carpeta){ const n=String(nom||''), c=String(carpeta||''); let r;
+  if(c && n.toLowerCase().startsWith(c.toLowerCase()+'__')) r=n.slice(c.length+2); else { const i=n.indexOf('__'); if(i<1) return ''; r=n.slice(i+2); }
+  const m=/^([A-Za-z0-9][A-Za-z0-9-]*)_/.exec(r); return m ? m[1].toUpperCase() : ''; }
+function sisDeJSON(d){ const m=d && (d.model||d), out=new Set(); if(!m || !Array.isArray(m.elements)) return [];   /* mateixes etiquetes que la Biblioteca de Projectes */
+  m.elements.forEach(e=>{ const p=e.particio||{}; if(p.sistema==='hsw') out.add((p.hsw && p.hsw.mode==='fsw') ? 'FSW plegable' : 'HSW corredissa'); else if(p.sistema==='batent') out.add('Portes batents'); else if(p.sistema==='fix') out.add('Fixos de vidre'); });
+  return [...out]; }
+function teVariants(p){ return !!(p && (p.variants||[]).some(v=>v.slug)); }
+function nomVar(p, s){ const v=(p.variants||[]).find(x=>x.slug===s); if(!s) return (v && v.nom) ? v.nom : 'Fitxer del projecte'; return (v && v.nom) || s; }
+function grupVar(p, f){ /* a quina variant va el fitxer: el slug; '' = fitxer de sempre; null = comú del projecte */
+  if(f.var) return f.var; const on=String(f.on||'').toUpperCase();
+  if(on.startsWith('MAMPARES')) return ''; if(on.startsWith('MEDIA') && (f.tipus==='3d' || f.tipus==='video')) return ''; return null; }
+function esAnt(f){ return /_anterior\.[a-z0-9]+$/i.test(f.nom||'') ? 1 : 0; }
+function ordAnt(L){ return L.slice().sort((a,b)=>esAnt(a)-esAnt(b)); }   /* els «_anterior», al final (l'ordre de la resta es manté) */
+const VAR_PLEG = new Set();   /* blocs de variant plegats a la fitxa (ruta|slug) */
 
 let DB = { projectes:{}, fitxers:{} };   // catàleg de la Biblioteca (només lectura)
 let INV = [];                             // [{ ruta, grup, nom, meta, apps[], sisAuto[], media[], lliur[], mod }]
@@ -569,14 +601,22 @@ async function reconstrueix(){
     const pd=e.path_display.split('/'), f=parts[parts.length-1], prof=parts.length-3, dins=pd.slice(pd.length-(parts.length-2), pd.length-1), nomO=pd[pd.length-1];
     const mod=e.server_modified?Date.parse(e.server_modified):null; if(mod && (!p.mod||mod>p.mod)) p.mod=mod;
     if(prof===0 && f==='_projecte.json'){ p._meta=e.path_display; return; }
+    if(prof===1 && dins[0] && dins[0].toUpperCase()==='MAMPARES' && RE_VJSON.test(f)){ (p._vjs=p._vjs||[]).push({ cami:e.path_display, nom:nomO, mod }); return; }   /* v3.2 */
     const t=tipusDe(f); if(t==='altre' || /_net\.dxf$/i.test(f) || /\.(bak|tmp)$/i.test(f)) return;
     if(prof>2) return;
     if(dins[0] && dins[0].toLowerCase()==='media') p.media.push({ cami:e.path_display, nom:nomO, tipus:t, on:dins.join('/'), mod, mida:e.size });
     else p.lliur.push({ cami:e.path_display, nom:nomO, tipus:t, on:dins.join('/'), mod, mida:e.size }); });
   const L=Object.values(perRuta).filter(p=>p.ruta);
+  const prevV=new Map(); INV.forEach(q=>(q.variants||[]).forEach(v=>{ if(v.fitxer && v.mod) prevV.set(v.fitxer+'|'+v.mod, v); }));   /* v3.2: només es rebaixen els JSON canviats */
   /* _projecte.json (nom, tipus_baranes, data_creacio, ubicacio): es baixen de 6 en 6 */
   for(let i=0;i<L.length;i+=6){ await Promise.all(L.slice(i,i+6).map(async p=>{ if(p._meta){ p.meta=(await baixaJSON(p._meta))||{}; p.nom=p.meta.nom||p.nomCarpeta; } })); progres(0.6+0.4*Math.min(1,(i+6)/L.length)); $('estat').textContent='⏳ fitxes de projecte '+Math.min(L.length,i+6)+'/'+L.length; }
+  /* v3.2 · variants: un JSON per slug (mana el _rev), el nom del camp «variant» i els sistemes de cada una; els orfes, pel slug dels fitxers */
+  for(const p of L){ const per={}; (p._vjs||[]).forEach(x=>{ const sl=slugDe(x.nom, p.nomCarpeta), rev=/_rev\.json$/i.test(x.nom), ja=per[sl]; if(!ja || (rev && !ja.rev)) per[sl]={ slug:sl, fitxer:x.cami, mod:x.mod, rev }; });
+    const V=Object.values(per); for(const v of V){ const pv=v.mod ? prevV.get(v.fitxer+'|'+v.mod) : null; if(pv){ v.nom=pv.nom; v.sis=pv.sis; } else { const d=await baixaJSON(v.fitxer); v.nom=(d && typeof d.variant==='string') ? d.variant.trim() : ''; v.sis=sisDeJSON(d); } delete v.rev; }
+    p.media.concat(p.lliur).forEach(f=>{ f.var=slugDe(f.nom, p.nomCarpeta); if(f.var && !V.some(v=>v.slug===f.var)) V.push({ slug:f.var, nom:'', sis:[], orfe:true }); });
+    V.sort((a,b)=>(a.slug?1:0)-(b.slug?1:0) || String(a.nom||a.slug).localeCompare(String(b.nom||b.slug),'ca')); p.variants=V; delete p._vjs; }
   L.forEach(p=>{ const sis=new Set(); if(GRUPS[p.grup]) sis.add(GRUPS[p.grup]);
+    (p.variants||[]).forEach(v=>(v.sis||[]).forEach(x=>sis.add(x)));   /* v3.2 */
     (Array.isArray(p.meta.tipus_baranes)?p.meta.tipus_baranes:[]).forEach(t=>{ const k=String(t||'').toLowerCase(); if(TIPUS_PROJ[k]) sis.add(TIPUS_PROJ[k]); });
     [...p._dirs].forEach(d=>{ if(d.toUpperCase()==='MEDIA') return; p.apps.push(d); if(SUBS[d.toUpperCase()]) sis.add(SUBS[d.toUpperCase()]); });
     p.sisAuto=[...sis]; delete p._dirs; delete p._meta;
@@ -619,7 +659,7 @@ function fitxersQueQuadren(p, S, ignora){   /* fitxers del projecte p que passen
   if(ignora!=='s' && S.s && !sistemesDe(p).includes(S.s)) return [];
   if(ignora!=='a' && S.a && anyDe(p)!==S.a) return [];
   let F=fitxersDe(p); if(ignora!=='t' && S.t) F=F.filter(f=>f.tipus===S.t);
-  if(S.q){ const txP=(nomVisible(p)+' '+(CFG.pres?'':(p.meta.client||''))+' '+sistemesDe(p).join(' ')+' '+(p.meta.ubicacio||'')+' '+(pj(p).nota||'')).toLowerCase();
+  if(S.q){ const txP=(nomVisible(p)+' '+(CFG.pres?'':(p.meta.client||''))+' '+sistemesDe(p).join(' ')+' '+(p.meta.ubicacio||'')+' '+(pj(p).nota||'')+' '+(p.variants||[]).map(v=>v.nom||v.slug).join(' ')).toLowerCase();
     if(!txP.includes(S.q)) F=F.filter(f=>((fx(f.cami).titol||'')+' '+f.nom+' '+(fx(f.cami).nota||'')).toLowerCase().includes(S.q)); }
   if(ignora!=='d' && S.d) F=F.filter(f=>fx(f.cami).destacat || pj(p).destacat);
   return F;
@@ -631,7 +671,7 @@ function projecteBuit(p, S, ignora){
   if(ignora!=='g' && S.g && p.grup!==S.g) return false;
   if(ignora!=='s' && S.s && !sistemesDe(p).includes(S.s)) return false;
   if(ignora!=='a' && S.a && anyDe(p)!==S.a) return false;
-  if(S.q){ const txP=(nomVisible(p)+' '+(p.meta.client||'')+' '+sistemesDe(p).join(' ')+' '+(p.meta.ubicacio||'')+' '+(pj(p).nota||'')).toLowerCase(); if(!txP.includes(S.q)) return false; }
+  if(S.q){ const txP=(nomVisible(p)+' '+(p.meta.client||'')+' '+sistemesDe(p).join(' ')+' '+(p.meta.ubicacio||'')+' '+(pj(p).nota||'')+' '+(p.variants||[]).map(v=>v.nom||v.slug).join(' ')).toLowerCase(); if(!txP.includes(S.q)) return false; }
   return true;
 }
 function omplirFiltres(){
@@ -833,13 +873,13 @@ function pinta(){
   L.forEach(({p,F})=>{ const obert=desplegaTot || OBERTS.has(p.ruta);
     const nV=F.filter(f=>f.tipus==='video').length, n3=F.filter(f=>f.tipus==='3d').length, nI=F.filter(f=>f.tipus==='imatge').length, nD=F.filter(f=>f.tipus==='doc').length, nC=F.filter(f=>f.tipus==='cad').length;
     const cap=document.createElement('div'); cap.className='grup-proj'+(obert?' obert':'');
-    cap.innerHTML='<div class="n">'+(obert?'▾':'▸')+' '+(pj(p).destacat?'<span class="estrella">★</span> ':'')+esc(nomVisible(p))+'</div><div class="s">'+esc([sistemesDe(p).join(' · ')||GRUPS[p.grup]||'', anyDe(p), [nV?nV+' 🎬':'', n3?n3+' 🧊':'', nI?nI+' 🖼':'', nD?nD+' 📄':'', nC?nC+' 📐':''].filter(Boolean).join(' ')].filter(Boolean).join(' · '))+'</div><button>Fitxa ›</button>';
+    cap.innerHTML='<div class="n">'+(obert?'▾':'▸')+' '+(pj(p).destacat?'<span class="estrella">★</span> ':'')+esc(nomVisible(p))+'</div><div class="s">'+esc([sistemesDe(p).join(' · ')||GRUPS[p.grup]||'', anyDe(p), teVariants(p)?p.variants.length+' variants':'', [nV?nV+' 🎬':'', n3?n3+' 🧊':'', nI?nI+' 🖼':'', nD?nD+' 📄':'', nC?nC+' 📐':''].filter(Boolean).join(' ')].filter(Boolean).join(' · '))+'</div><button>Fitxa ›</button>';
     cap.querySelector('button').onclick=e=>{ e.stopPropagation(); obreFitxa(p); };
     cap.onclick=()=>{ if(OBERTS.has(p.ruta)) OBERTS.delete(p.ruta); else OBERTS.add(p.ruta); pinta(); };
     T.appendChild(cap); if(!obert) return;
     if(!F.length){ const b=document.createElement('div'); b.className='buit'; b.style.padding='8px 12px'; b.textContent='Sense fitxers per veure al mòbil'+(p.apps.length?' (carpetes: '+p.apps.join(', ')+')':'')+'.'; T.appendChild(b); return; }   /* v2.4 */
     F.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fitxer';
-      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+(offTe(f.cami)?' · <span class="offsi">📥 desat</span>':'')+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
+      el.innerHTML='<div class="mini2">'+icona(f.tipus)+'</div><div class="cos"><div class="t">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="d">'+esc([f.on||'projecte', (teVariants(p) && grupVar(p,f)!==null)?'◆ '+nomVar(p,grupVar(p,f)):'', f.mida?midaTx(f.mida):'', dataTx(f.mod)].filter(Boolean).join(' · '))+(offTe(f.cami)?' · <span class="offsi">📥 desat</span>':'')+'</div><div class="acc"><button class="veure">'+(f.tipus==='cad'?'📐 Veure':f.tipus==='3d'?'🧊 Girar':'▶ Veure')+'</button><button class="sec envia">📤 Enviar</button></div></div>';
       el.querySelector('.veure').onclick=()=>obreVisor(f, false, SEQ_R); el.querySelector('.envia').onclick=()=>obreVisor(f, true, SEQ_R); T.appendChild(el);
       demanaPrevia(el.querySelector('.mini2'), f, SEQ_R); }); });
 }
@@ -849,14 +889,30 @@ function obreFitxa(p){
   OBERT=p; $('fNom').innerHTML=(pj(p).destacat?'<span class="estrella">★</span> ':'')+esc(nomVisible(p)); $('titol').textContent=nomVisible(p);
   const sub=[sistemesDe(p).join(' · '), anyDe(p), CFG.pres?'':(p.meta.client||''), p.meta.ubicacio||''].filter(Boolean).join(' · '); $('fSub').textContent=sub;
   $('fNota').textContent=pj(p).nota||''; pintaOff(p);   /* v3.1 */
-  const M=$('fMedia'); M.innerHTML=''; const med=fitxersDe(p).filter(f=>f.on.toLowerCase().startsWith('media'));
-  if(!med.length) M.innerHTML='<div class="buit" style="grid-column:1/-1;padding:14px">Sense vídeos ni imatges a MEDIA.</div>';
-  med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f, med); });
-  const Ll=$('fLliur'); Ll.innerHTML=''; const ll=fitxersDe(p).filter(f=>!f.on.toLowerCase().startsWith('media'));
-  if(!ll.length) Ll.innerHTML='<div class="buit" style="padding:14px">Sense lliurables.</div>';
-  ll.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fila'; el.innerHTML='<div class="ic">'+icona(f.tipus)+'</div><div class="t"><div class="n">'+(o.destacat?'<span class="estrella">★</span> ':'')+esc(o.titol||f.nom)+'</div><div class="on">'+esc(f.on||'projecte')+(f.mida?' · '+midaTx(f.mida):'')+'</div></div><div class="d">'+dataTx(f.mod)+'</div>'; el.onclick=()=>obreVisor(f, false, ll); Ll.appendChild(el); if(f.tipus==='doc' || f.tipus==='cad') demanaPrevia(el.querySelector('.ic'), f, ll); });
+  const V=teVariants(p), Fp=fitxersDe(p), comu=V ? Fp.filter(f=>grupVar(p,f)===null) : Fp;   /* v3.2: amb variants, aquí només el comú */
+  $('sMedia').textContent=V?'🎞 Media comuna':'🎞 Media'; $('sLliur').textContent=V?'📎 Lliurables comuns':'📎 Lliurables';
+  const M=$('fMedia'); M.innerHTML=''; const med=ordAnt(comu.filter(esMediaF));
+  if(!med.length) M.innerHTML='<div class="buit" style="grid-column:1/-1;padding:14px">'+(V?'Res de comú a MEDIA (cada variant, a sota).':'Sense vídeos ni imatges a MEDIA.')+'</div>';
+  pintaMed(M, med);
+  const Ll=$('fLliur'); Ll.innerHTML=''; const ll=ordAnt(comu.filter(f=>!esMediaF(f)));
+  if(!ll.length) Ll.innerHTML='<div class="buit" style="padding:14px">'+(V?'Sense lliurables comuns.':'Sense lliurables.')+'</div>';
+  pintaLl(Ll, ll); pintaVariants(p);
   mostra('pFitxa');
 }
+function esMediaF(f){ return String(f.on||'').toLowerCase().startsWith('media'); }
+function pintaMed(M, med){ med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+(esAnt(f)?'🕘 ':'')+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f, med); }); }
+function pintaLl(Ll, ll){ ll.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fila'; el.innerHTML='<div class="ic">'+icona(f.tipus)+'</div><div class="t"><div class="n">'+(o.destacat?'<span class="estrella">★</span> ':'')+(esAnt(f)?'🕘 ':'')+esc(o.titol||f.nom)+'</div><div class="on">'+esc(f.on||'projecte')+(f.mida?' · '+midaTx(f.mida):'')+'</div></div><div class="d">'+dataTx(f.mod)+'</div>'; el.onclick=()=>obreVisor(f, false, ll); Ll.appendChild(el); if(f.tipus==='doc' || f.tipus==='cad') demanaPrevia(el.querySelector('.ic'), f, ll); }); }
+/* v3.2 · un bloc per variant: títol (nom · fitxer del projecte · sistemes; un toc el plega) i el seu 3D, vídeos i plànols */
+function pintaVariants(p){ const B=$('fVars'); B.innerHTML=''; if(!teVariants(p)) return; const F=fitxersDe(p);
+  p.variants.forEach(v=>{ const k=p.ruta+'|'+v.slug, plegat=VAR_PLEG.has(k), G=F.filter(f=>grupVar(p,f)===v.slug);
+    const cap=document.createElement('div'); cap.className='seccio var';
+    cap.innerHTML=(plegat?'▸ ':'▾ ')+'◆ '+esc(nomVar(p,v.slug))+'<span class="vsub">'+esc([v.slug?'':'fitxer del projecte', v.orfe?'sense fitxer de Mampares (nom antic?)':'', (v.sis||[]).join(' · '), G.length?G.length+' fitxer'+(G.length>1?'s':''):''].filter(Boolean).join(' · '))+'</span>';
+    cap.onclick=()=>{ if(VAR_PLEG.has(k)) VAR_PLEG.delete(k); else VAR_PLEG.add(k); pintaVariants(p); };
+    B.appendChild(cap); if(plegat) return;
+    if(!G.length){ const b=document.createElement('div'); b.className='buit'; b.style.padding='10px 14px'; b.textContent=OFFLINE?'Res desat a l\'aparell d\'aquesta variant.':'Encara sense 3D, vídeos ni plànols d\'aquesta variant.'; B.appendChild(b); return; }
+    const med=ordAnt(G.filter(esMediaF)), ll=ordAnt(G.filter(f=>!esMediaF(f)));
+    if(med.length){ const M=document.createElement('div'); M.className='graella'; B.appendChild(M); pintaMed(M, med); }
+    if(ll.length){ const L=document.createElement('div'); L.className='llista'; B.appendChild(L); pintaLl(L, ll); } }); }
 function midaTx(b){ return b>1e9?(b/1e9).toFixed(1)+' GB':b>1e6?(b/1e6).toFixed(1)+' MB':Math.round(b/1e3)+' kB'; }
 
 /* ═════════════ Previsualitzacions (v0.7): només quan la miniatura surt a la pantalla. Vídeo: el navegador en treu el fotograma
