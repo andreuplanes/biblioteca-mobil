@@ -3,11 +3,20 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v3.2b (18/10/2026)
+     PANELL · BIBLIOTECA MÒBIL · v3.4 (12/11/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v3.4: MATEIX NÚMERO QUE LA BIBLIOTECA DE PROJECTES v3.4 (protocol: les dues sempre igual). Aquí sense canvis de funcionament;
+      la de l'ordinador ha afegit la neteja de lliurables (caselles, «Marcar els antics», vista 🧹 Neteja) i el botó ✉ Gmail al visor.
+      A l'iPhone el correu ja surt al menú de compartir (Correu d'Apple), i la Mòbil no esborra res.
+     v3.3: TOC A LES PORTES DEL 3D (Andreu, 18/10: «tocar una porta al 3D mòbil i fer el mateix efecte que tenim als projectes amb
+      l'ordinador»). Els 3D desats amb Mampares v6.18 porten dues animacions: [0] «obrir i tancar» (la de sempre) i [1] «portes» (el tram
+      final: les portes obrint i tancant amb el tancament tancat; extras { portes:true, durada }). Si hi ha «portes», un toc curt sobre
+      el model (no arrossegar; el doble toc continua sent «anar-hi»: el toc sol espera 0,4 s), amb «⏸ Quiet» i la barra a tancat, obre i
+      tanca TOTES les portes alhora i torna a «obrir i tancar» quiet i tancat. Amb «▶ Moviment» o la barra oberta, el toc fa el de
+      sempre. No es fa servir materialFromPoint (el 3D porta arestes i torna null). 3D antics: res de nou. Projectes: v3.3 (el mateix).
      v3.2b: CORRECCIÓ (Andreu, 18/10: «a la d'escriptori surten PROPOSTA INICIAL / OPCIO 1 PORTA, però a la mòbil no»). En obrir, la
       Mòbil fa servir l'inventari desat a l'aparell i només el refà si Dropbox ha canviat; el desat per la v3.1 no tenia variants i, sense
       canvis a Dropbox, no es refeia. Ara, si l'inventari desat no porta variants, es refà sempre (un sol cop). I el 🕘 dels «_anterior» també a la llista de resultats (com a l'ordinador). Biblioteca de Projectes: v3.2b.
@@ -434,7 +443,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v3.2b';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+const APP_VERSION = 'v3.4';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
 document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
@@ -1057,8 +1066,8 @@ function gestos3D(mv){ if(!mv || mv._gestos) return; mv._gestos=true;
   let baix=null, t0=0, x0=0, y0=0;
   mv.addEventListener('pointerdown', e=>{ baix={ x:e.clientX, y:e.clientY, t:Date.now() }; }, { capture:true });
   mv.addEventListener('pointerup', e=>{ if(!baix) return; const toc=Date.now()-baix.t<300 && Math.hypot(e.clientX-baix.x, e.clientY-baix.y)<10; baix=null; if(!toc) return;
-    const ara=Date.now(); if(ara-t0<400 && Math.hypot(e.clientX-x0, e.clientY-y0)<40){ t0=0; const p=punt3D(mv,e.clientX,e.clientY); if(p) apunta3D(mv,p,0.45); }
-    else { t0=ara; x0=e.clientX; y0=e.clientY; } }, { capture:true }); }
+    const ara=Date.now(); if(ara-t0<400 && Math.hypot(e.clientX-x0, e.clientY-y0)<40){ t0=0; clearTimeout(mv._tPortes); const p=punt3D(mv,e.clientX,e.clientY); if(p) apunta3D(mv,p,0.45); }
+    else { t0=ara; x0=e.clientX; y0=e.clientY; clearTimeout(mv._tPortes); if(mv._tocPortes) mv._tPortes=setTimeout(()=>mv._tocPortes(), 400); } }, { capture:true }); }   /* v3.3: un toc sol (no doble) → portes */
 function zoom3D(mv, Z){ if(!mv || !Z) return; gestos3D(mv);
   Z.querySelectorAll('button').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); const z=+b.dataset.z;
     if(z) zoomCap3D(mv, null, z>0 ? 0.6 : 1/0.6); else vistaInicial3D(mv); }; });
@@ -1080,13 +1089,24 @@ function control3D(mv){
   extres3D(mv.getAttribute('src')).then(x=>{ X=x; if(!CFG.mou3d && mv.loaded && $('mv3dCtl')===ctl) posa(); });
   const tObert=()=>X ? Math.min(X.obert, mv.duration||X.obert) : tempsObert(mv.duration||0);   /* v0.9e */
   const pinta=()=>{ bp.textContent=CFG.mou3d?'⏸ Quiet':'▶ Moviment'; ctl.querySelectorAll('input,.et').forEach(e=>e.style.visibility=CFG.mou3d?'hidden':''); };
-  const posa=()=>{ mv.pause(); mv.currentTime=tObert()*obert; };
-  const aplica=()=>{ if(CFG.mou3d) mv.play({ repetitions:Infinity }); else posa(); pinta(); };
+  /* v3.3 · TOC A LES PORTES (Mampares v6.18): si el .glb porta l'animació «portes», un toc curt amb el model quiet i tancat
+     obre i tanca totes les portes (animations[1]) i torna a «obrir i tancar» (animations[0]) quiet i tancat. */
+  const tornaA0=()=>{ if(!mv._portesEnMarxa) return; mv._portesEnMarxa=false; clearInterval(mv._iPortes); const a=mv.availableAnimations||[]; if(a.length) mv.animationName=a[0]; };
+  mv._tocPortes=()=>{ const a=mv.availableAnimations||[]; if(!a.includes('portes') || CFG.mou3d || obert>0 || mv._portesEnMarxa) return;
+    mv._portesEnMarxa=true; mv.animationName='portes'; mv.currentTime=0; mv.play({ repetitions:1 });
+    /* el final: «finished» o, si el visor torna a començar (no sempre respecta repetitions), quan el temps arriba al final o torna enrere */
+    const acaba=()=>{ clearInterval(mv._iPortes); if(!mv._portesEnMarxa) return; tornaA0(); mv.pause(); mv.currentTime=0; };
+    let ant=0; clearInterval(mv._iPortes); mv._iPortes=setInterval(()=>{ if(!mv._portesEnMarxa || !mv.isConnected){ clearInterval(mv._iPortes); return; }
+      const t=mv.currentTime, d=mv.duration||0; if((d && t>=d-0.04) || t+0.05<ant) acaba(); else ant=t; }, 40);
+    mv.addEventListener('finished', acaba, { once:true }); };
+  const posa=()=>{ tornaA0(); mv.pause(); mv.currentTime=tObert()*obert; };
+  const aplica=()=>{ tornaA0(); if(CFG.mou3d) mv.play({ repetitions:Infinity }); else posa(); pinta(); };
   const recorda=()=>{ try{ localStorage.setItem('bm.mou3d',CFG.mou3d?'1':'0'); }catch(e){} };
   bp.onclick=()=>{ CFG.mou3d=!CFG.mou3d; recorda(); if(!CFG.mou3d){ obert=0; pos.value=0; } aplica(); };
   pos.oninput=()=>{ obert=pos.value/1000; if(CFG.mou3d){ CFG.mou3d=false; recorda(); } posa(); pinta(); };
   ['pointerdown','touchstart','mousedown'].forEach(t=>ctl.addEventListener(t,e=>e.stopPropagation()));
-  mv.addEventListener('load',()=>{ const a=mv.availableAnimations||[]; if(!a.length) return; mv.animationName=a[0]; ctl.style.display=''; aplica(); },{ once:true });
+  mv.addEventListener('load',()=>{ const a=mv.availableAnimations||[]; if(!a.length) return; mv.animationName=a[0]; ctl.style.display=''; aplica();
+    if(a.includes('portes')) toast('👆 Toca el model (quiet i tancat) per obrir les portes.', 3500); },{ once:true });   /* v3.3 */
 }
 /* ═════════════ Visor ═════════════ */
 let VF=null, VBLOB=null;
