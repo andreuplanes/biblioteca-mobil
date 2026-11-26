@@ -3,11 +3,16 @@
 <head>
 <meta charset="utf-8">
 <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════
-     PANELL · BIBLIOTECA MÒBIL · v3.4 (12/11/2026)
+     PANELL · BIBLIOTECA MÒBIL · v3.7 (25/11/2026)
      IDENTITAT PANELL: id oficina-biblioteca-mobil-rev · fitxer apps/oficina_tecnica/_cuina/oficina_biblioteca_mobil_rev.html ·
        sector oficina_tecnica · CUINA (prova). Al PANELL s'obre DINS D'UN iPHONE simulat (mode PANELL: llegeix el disc pel servidor,
        visor 3D a apps/comu/visor3d/). La DEFINITIVA per als mòbils és el mateix fitxer publicat fora (GitHub Pages) amb
        manifest + icones + model-viewer.min.js al costat, on llegeix el Dropbox de cada usuari.
+     v3.7 (25/11/2026): EL PES I LA DATA DELS VÍDEOS I ELS 3D (Andreu: «a la mòbil no veig la data de creació»; «que indiqui el tamany de l'arxiu»;
+      «els vídeos em peten i els 3D grans no es carreguen»). A cada miniatura de MEDIA, una franja a dalt amb la data i l'hora del fitxer i el pes,
+      amb color (🟢 ≤ 15 MB vídeo / ≤ 8 MB 3D · 🟠 ≤ 35 / ≤ 20 · 🔴 més), i 📱 als fitxers «_mobil»; a la llista de lliurables, l'hora i el pes amb
+      el mateix color. v3.7b: dins del PANELL el pes es demana fitxer per fitxer (la llista local no el porta) i surt a dalt a la dreta, després
+      de l'hora; l'etiqueta «▶ vídeo / 3D» baixa sota la franja. MATEIX NÚMERO QUE LA BIBLIOTECA DE PROJECTES v3.7 (es salta de la 3.4 a la 3.7 per igualar-les).
      v3.4: MATEIX NÚMERO QUE LA BIBLIOTECA DE PROJECTES v3.4 (protocol: les dues sempre igual). Aquí sense canvis de funcionament;
       la de l'ordinador ha afegit la neteja de lliurables (caselles, «Marcar els antics», vista 🧹 Neteja) i el botó ✉ Gmail al visor.
       A l'iPhone el correu ja surt al menú de compartir (Correu d'Apple), i la Mòbil no esborra res.
@@ -175,7 +180,7 @@
 <meta name="theme-color" content="#1f3a5f">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Biblioteca de Projectes · mòbil</title>
+<title>Biblioteca de Projectes · mòbil · v3.7</title>
 <style>
 :root{ --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px); --blau:#1f3a5f; --blau2:#2d5fa6; --fons:#f4f3ee; --carta:#fff; --text:#1c1c1c; --gris:#6b6a62; --linia:#dcdad2; --verd:#2e7d32; --taronja:#b87000; --verm:#c62828; }
 *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -262,7 +267,11 @@ body.offline header{ background:#6b5526; }
 .mini{ background:var(--carta); border-radius:10px; overflow:hidden; aspect-ratio:1; position:relative; display:flex; align-items:center; justify-content:center; font-size:30px; color:#9b998f; box-shadow:0 1px 2px rgba(0,0,0,.08); }
 .mini img{ width:100%; height:100%; object-fit:cover; }
 .mini .peu{ position:absolute; left:0; right:0; bottom:0; background:rgba(0,0,0,.55); color:#fff; font-size:11px; padding:3px 5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.mini .estrella{ position:absolute; top:4px; right:6px; font-size:14px; }
+.mini .estrella{ position:absolute; top:20px; right:6px; font-size:14px; }
+.mini .cap{ position:absolute; left:0; right:0; top:0; z-index:2; background:rgba(0,0,0,.58); color:#fff; font-size:10px; line-height:1.2; padding:3px 5px; display:flex; gap:4px; align-items:center; white-space:nowrap; overflow:hidden; }
+.mini .cap .dt{ flex:1; overflow:hidden; text-overflow:ellipsis; opacity:.92; } .mini .cap .pes{ font-weight:700; margin-left:auto; flex:none; } .mini .cap .mob{ font-size:11px; }
+.mini .pv-marca{ top:22px !important; }
+.pes.v{ color:#86efac; } .pes.t{ color:#fdba74; } .pes.r{ color:#fca5a5; }
 .llista{ margin:8px 12px; background:var(--carta); border-radius:12px; overflow:hidden; }
 .fila{ display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:1px solid var(--linia); }
 .fila:last-child{ border-bottom:0; }
@@ -344,7 +353,7 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <header>
   <button id="bEnrere" style="display:none">‹</button>
-  <h1 id="titol">Biblioteca de Projectes</h1><span id="hVer" class="hver"></span>
+  <h1 id="titol">Biblioteca de Projectes</h1><span id="versionBadge" class="hver">v3.7</span>
   <button id="bActualitza" title="Actualitzar des de Dropbox">↻</button>
   <a id="bTancaPanell" href="/sistema/coordinador.html" onclick="return tancaApp(event)" title="Tancar i tornar al menú principal del PANELL" style="display:none">✕</a>
   <button id="bConfig" title="Configuració">⚙</button>
@@ -443,8 +452,8 @@ model-viewer .ar{ position:absolute; top:12px; right:12px; background:#fff; colo
 
 <script>
 /* ═════════════ Configuració ═════════════ */
-const APP_VERSION = 'v3.4';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
-document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('hVer'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
+const APP_VERSION = 'v3.7';   /* v0.9e: es veu a ⚙ (Configuració) i a la barra del marc de l'iPhone al PANELL; canviar-la a cada versió */
+document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('versionBadge'); if(v) v.textContent=APP_VERSION; });   /* v2.2 */
 const APP_KEY_DEFECTE = 'dxrv8aimitxgbmf';   // clau de l'app de Dropbox «PANELL Biblioteca mobil» (Andreu, 12/10/2026); també es pot canviar a ⚙
 const ARREL_DEFECTE   = '/PANELL';   // carpeta del PANELL a Dropbox
 const DB_CAMI = 'dades/oficina_tecnica/biblioteca_projectes/biblioteca_projectes';   // + _rev.json / .json
@@ -582,7 +591,7 @@ async function llegeixTotLocal(){
   const F=Object.values(ENTRADES).filter(e=>e['.tag']==='file').map(e=>e.path_display.slice(1));
   for(let i=0;i<F.length;i+=400){ try{ const r=await fetch('/dates-fitxers',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ rutes:F.slice(i,i+400) }) });
       if(!r.ok) break; const j=await r.json(); if(!(j && j.ok)) break;
-      Object.entries(j.dates||{}).forEach(([c,d])=>{ const e=ENTRADES[('/'+c).toLowerCase()]; if(e && d && d.mod) e.server_modified=new Date(d.mod).toISOString(); }); }catch(e){ break; } }
+      Object.entries(j.dates||{}).forEach(([c,d])=>{ const e=ENTRADES[('/'+c).toLowerCase()]; if(e && d && d.mod) e.server_modified=new Date(d.mod).toISOString(); if(e && d && +d.mida>0) e.size=+d.mida; }); }catch(e){ break; } }
   CURSOR=null; await reconstrueix(); desaCau();
 }
 async function llegeixTot(){
@@ -913,8 +922,22 @@ function obreFitxa(p){
   mostra('pFitxa');
 }
 function esMediaF(f){ return String(f.on||'').toLowerCase().startsWith('media'); }
-function pintaMed(M, med){ med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+(esAnt(f)?'🕘 ':'')+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f, med); }); }
-function pintaLl(Ll, ll){ ll.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fila'; el.innerHTML='<div class="ic">'+icona(f.tipus)+'</div><div class="t"><div class="n">'+(o.destacat?'<span class="estrella">★</span> ':'')+(esAnt(f)?'🕘 ':'')+esc(o.titol||f.nom)+'</div><div class="on">'+esc(f.on||'projecte')+(f.mida?' · '+midaTx(f.mida):'')+'</div></div><div class="d">'+dataTx(f.mod)+'</div>'; el.onclick=()=>obreVisor(f, false, ll); Ll.appendChild(el); if(f.tipus==='doc' || f.tipus==='cad') demanaPrevia(el.querySelector('.ic'), f, ll); }); }
+/* v3.7 (Andreu, 25/11/2026: «a la mòbil no veig la data de creació»; «a part de l'hora del vídeo, que indiqui el tamany de l'arxiu»; «els vídeos
+   em peten i els 3D grans no es carreguen»): a cada vídeo i 3D, la DATA I L'HORA del fitxer i el PES, amb color segons si és viable al telèfon
+   (🟢 lleuger · 🟠 pesat · 🔴 massa gros), i 📱 als fitxers «_mobil» (la versió lleugera que fa Mampares). Llindars provisionals: vídeo 15 / 35 MB,
+   3D 8 / 20 MB. Les mateixes regles que la Biblioteca de Projectes v3.7. */
+function pesNiv(f){ const mb=(+f.mida||0)/1e6; if(!mb) return ''; if(f.tipus==='video') return mb<=15?'v':(mb<=35?'t':'r'); if(f.tipus==='3d') return mb<=8?'v':(mb<=20?'t':'r'); return ''; }
+function esMobilF(f){ return /_mobil\.[a-z0-9]+$/i.test(String(f.nom||f.cami||'')); }
+function dataHoraTx(t){ if(!t) return ''; const d=new Date(t), z=n=>String(n).padStart(2,'0'); return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2)+' '+z(d.getHours())+':'+z(d.getMinutes()); }
+function capMed(f){ const nv=pesNiv(f), pes=f.mida ? midaTx(f.mida) : '', dt=dataHoraTx(f.mod); if(!pes && !dt) return ''; const tx={ v:'lleuger: va bé al telèfon', t:'pesat per al telèfon', r:'massa gros per al telèfon' }[nv]||'';
+  return '<div class="cap" title="'+esc(tx)+'">'+(esMobilF(f)?'<span class="mob">📱</span>':'')+'<span class="dt">'+esc(dt)+'</span>'+(pes?'<span class="pes '+nv+'">'+(nv?'● ':'')+esc(pes)+'</span>':'')+'</div>'; }
+/* v3.7b (Andreu, amb captura: «a la mòbil no surt la mida de l'arxiu; un bon lloc seria a la part superior dreta, després de l'hora»): dins del PANELL
+   (mode LOCAL) la llista de fitxers no porta el pes (al Dropbox del telèfon sí): es demana fitxer per fitxer (HEAD, Content-Length) quan es pinta
+   la miniatura, i la franja es refà. L'etiqueta «▶ vídeo / 3D» baixa sota la franja, que la tapava. */
+function pesLocal(el, f){ if(!LOCAL || +f.mida>0 || !(f.tipus==='video' || f.tipus==='3d')) return;
+  fetch(urlLocal(f.cami), { method:'HEAD', cache:'no-store' }).then(r=>{ const n=r.ok ? +r.headers.get('Content-Length') : 0; if(!(n>0)) return; f.mida=n; const c=el.querySelector('.cap'), h=capMed(f); if(c) c.outerHTML=h; else el.insertAdjacentHTML('afterbegin', h); }).catch(()=>{}); }
+function pintaMed(M, med){ med.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='mini'; el.innerHTML=icona(f.tipus)+capMed(f)+(o.destacat?'<span class="estrella">★</span>':'')+'<div class="peu">'+(esAnt(f)?'🕘 ':'')+esc(o.titol||f.nom)+'</div>'; M.appendChild(el); demanaPrevia(el, f, med); pesLocal(el, f); }); }
+function pintaLl(Ll, ll){ ll.forEach(f=>{ const o=fx(f.cami), el=document.createElement('div'); el.className='fila'; el.innerHTML='<div class="ic">'+icona(f.tipus)+'</div><div class="t"><div class="n">'+(o.destacat?'<span class="estrella">★</span> ':'')+(esAnt(f)?'🕘 ':'')+esc(o.titol||f.nom)+'</div><div class="on">'+esc(f.on||'projecte')+(f.mida?' · <span class="pes '+pesNiv(f)+'" style="font-weight:600;filter:brightness(.62)">'+midaTx(f.mida)+'</span>':'')+(esMobilF(f)?' · 📱':'')+'</div></div><div class="d">'+dataHoraTx(f.mod)+'</div>'; el.onclick=()=>obreVisor(f, false, ll); Ll.appendChild(el); if(f.tipus==='doc' || f.tipus==='cad') demanaPrevia(el.querySelector('.ic'), f, ll); }); }
 /* v3.2 · un bloc per variant: títol (nom · fitxer del projecte · sistemes; un toc el plega) i el seu 3D, vídeos i plànols */
 function pintaVariants(p){ const B=$('fVars'); B.innerHTML=''; if(!teVariants(p)) return; const F=fitxersDe(p);
   p.variants.forEach(v=>{ const k=p.ruta+'|'+v.slug, plegat=VAR_PLEG.has(k), G=F.filter(f=>grupVar(p,f)===v.slug);
